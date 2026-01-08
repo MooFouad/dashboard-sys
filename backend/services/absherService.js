@@ -1,0 +1,1123 @@
+const axios = require('axios');
+const AbsherConfig = require('../models/AbsherConfig');
+
+// Import mock service for demo mode
+const absherMockService = require('./mocks/absherMockService');
+
+/**
+ * TAMM API Service (Absher Business)
+ * Handles authentication and vehicle insurance inquiries
+ * Configuration is read from database first, then falls back to environment variables
+ *
+ * Demo Mode: When DEMO_MODE=true in environment, uses mock responses instead of real API
+ */
+class TammService {
+  constructor() {
+    this.accessToken = null;
+    this.tokenExpiry = null;
+    this.config = null;
+    this.configLoaded = false;
+    this.initializationError = null;
+    this.initializationPromise = null;
+
+    // Initialize config asynchronously and store the promise
+    this.initializationPromise = this.initializeConfig();
+  }
+
+  /**
+   * Initialize configuration from database or environment variables
+   */
+  async initializeConfig() {
+    try {
+      // Skip database config loading in demo/mock mode
+      const useMockData = process.env.USE_MOCK_DATA === 'true';
+      const demoMode = process.env.DEMO_MODE === 'true';
+
+      let dbConfig = null;
+
+      // Only try to load from database if not in mock/demo mode
+      if (!useMockData && !demoMode) {
+        dbConfig = await AbsherConfig.findOne({ status: 'active' });
+      }
+
+      if (dbConfig) {
+        // Build auth URL from database config
+        const authUrl = `${dbConfig.authorizationServer}/auth/realms/${dbConfig.realmName}/protocol/openid-connect/token`;
+
+        this.config = {
+          authUrl: authUrl,
+          apiUrl: process.env.TAMM_API_URL || 'https://tamm.api.elm.sa',
+          clientId: dbConfig.clientId,
+          clientSecret: dbConfig.clientSecret,
+          subscriptionKey: process.env.TAMM_SUBSCRIPTION_KEY || '',
+          authServer: dbConfig.authorizationServer,
+          realmName: dbConfig.realmName,
+          integratorUserId: process.env.TAMM_INTEGRATOR_USER_ID || '7001486054'
+        };
+
+        console.log('🔧 Absher Service initialized with DATABASE configuration');
+        console.log(`   Auth URL: ${this.config.authUrl}`);
+        console.log(`   API URL: ${this.config.apiUrl}`);
+        console.log(`   Client ID: ***${this.config.clientId.slice(-4)}`);
+        console.log(`   Realm: ${this.config.realmName}`);
+      } else {
+        // Fallback to environment variables
+        this.config = {
+          authUrl: process.env.TAMM_AUTH_URL,
+          apiUrl: process.env.TAMM_API_URL,
+          clientId: process.env.TAMM_CLIENT_ID,
+          clientSecret: process.env.TAMM_CLIENT_SECRET,
+          subscriptionKey: process.env.TAMM_SUBSCRIPTION_KEY,
+          integratorUserId: process.env.TAMM_INTEGRATOR_USER_ID || '7001486054'
+        };
+
+        console.log('🔧 Absher Service initialized with ENVIRONMENT VARIABLES (fallback)');
+        console.log(`   Auth URL: ${this.config.authUrl || 'NOT SET'}`);
+        console.log(`   API URL: ${this.config.apiUrl || 'NOT SET'}`);
+        console.log(`   Client ID: ${this.config.clientId ? '***' + this.config.clientId.slice(-4) : 'NOT SET'}`);
+      }
+
+      // Validate that required config fields are present (skip validation in demo/mock mode)
+      if (!useMockData && !demoMode) {
+        if (!this.config.authUrl || !this.config.apiUrl || !this.config.clientId || !this.config.clientSecret) {
+          throw new Error('TAMM configuration is incomplete. Required fields: authUrl, apiUrl, clientId, clientSecret');
+        }
+      } else {
+        // Demo mode - use placeholder config
+        this.config = {
+          authUrl: 'demo-mode',
+          apiUrl: 'demo-mode',
+          clientId: 'demo-mode',
+          clientSecret: 'demo-mode',
+          subscriptionKey: '',
+          integratorUserId: '7001486054'
+        };
+        console.log('🎭 Absher Service initialized in DEMO MODE (using mocks)');
+      }
+
+      this.configLoaded = true;
+      this.initializationError = null;
+    } catch (error) {
+      console.error('❌ Error initializing Absher Service configuration:', error.message);
+      this.initializationError = error;
+      this.configLoaded = true; // Mark as "loaded" (failed) to stop waiting
+      throw error; // Re-throw to be caught in getConfig
+    }
+  }
+
+  /**
+   * Reload configuration from database
+   */
+  async reloadConfig() {
+    this.configLoaded = false;
+    await this.initializeConfig();
+    // Clear token cache when config changes
+    this.accessToken = null;
+    this.tokenExpiry = null;
+  }
+
+  /**
+   * Get TAMM configuration (wait for config to load if needed)
+   */
+  async getConfig() {
+    // Wait for initialization to complete
+    if (this.initializationPromise) {
+      try {
+        await this.initializationPromise;
+      } catch (error) {
+        // Initialization failed, error already logged
+      }
+    }
+
+    // Check if initialization failed
+    if (this.initializationError) {
+      throw new Error(`TAMM configuration failed to load: ${this.initializationError.message}. Please check database or environment variables (TAMM_AUTH_URL, TAMM_API_URL, TAMM_CLIENT_ID, TAMM_CLIENT_SECRET).`);
+    }
+
+    // Additional safety check for config completeness
+    if (!this.config || !this.config.authUrl || !this.config.apiUrl || !this.config.clientId || !this.config.clientSecret) {
+      throw new Error('TAMM configuration is incomplete. Please check database configuration or environment variables (TAMM_AUTH_URL, TAMM_API_URL, TAMM_CLIENT_ID, TAMM_CLIENT_SECRET)');
+    }
+
+    return this.config;
+  }
+
+  /**
+   * Generate Access Token from TAMM API with retry logic
+   * POST /auth/realms/Tamm-QA/protocol/openid-connect/token
+   */
+  async generateAccessToken(retryCount = 0) {
+    // Use mock service in demo mode
+    if (process.env.DEMO_MODE === 'true') {
+      return absherMockService.getAccessToken();
+    }
+
+    try {
+      const config = await this.getConfig();
+
+      // Check if we have a valid token already
+      if (this.accessToken && this.tokenExpiry && new Date() < this.tokenExpiry) {
+        console.log('✅ Using cached access token');
+        return this.accessToken;
+      }
+
+      console.log('🔄 Generating new TAMM access token...');
+      console.log('🔗 Auth URL:', config.authUrl);
+      if (retryCount > 0) {
+        console.log(`🔄 Retry attempt ${retryCount}/3`);
+      }
+
+      const params = new URLSearchParams();
+      params.append('client_id', config.clientId);
+      params.append('client_secret', config.clientSecret);
+      params.append('grant_type', 'client_credentials');
+
+      const response = await axios.post(config.authUrl, params, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        timeout: 90000 // Increased timeout to 90 seconds for slow networks
+      });
+
+      if (response.data && response.data.access_token) {
+        this.accessToken = response.data.access_token;
+
+        // Set token expiry (usually expires_in is in seconds)
+        const expiresIn = response.data.expires_in || 3600; // Default 1 hour
+        this.tokenExpiry = new Date(Date.now() + (expiresIn * 1000) - 60000); // Refresh 1 minute before expiry
+
+        console.log('✅ Access token generated successfully');
+        console.log(`⏰ Token expires in ${expiresIn} seconds`);
+
+        return this.accessToken;
+      } else {
+        throw new Error('Invalid response from TAMM auth server');
+      }
+    } catch (error) {
+      console.error('❌ Error generating access token:', error.message);
+
+      // Retry logic for timeout errors
+      if ((error.code === 'ECONNABORTED' || error.message.includes('timeout')) && retryCount < 3) {
+        const waitTime = (retryCount + 1) * 5; // 5s, 10s, 15s waits
+        console.log(`⏳ Timeout occurred, waiting ${waitTime} seconds before retry...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
+        return this.generateAccessToken(retryCount + 1);
+      }
+
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+        console.error('Response status:', error.response.status);
+      }
+      throw new Error(`Failed to authenticate with TAMM API: ${error.message}`);
+    }
+  }
+
+  /**
+   * Load Profile API - Get User ID for integrator mode
+   * According to Profile Management IG: This API must be called when using Client Credentials flow
+   * Returns the User ID that should be used in X-Integrator-User-Id header for subsequent API calls
+   *
+   * @param {string} userIdNumber - National ID / Iqama number (e.g., "1023782800")
+   * @param {string} accountMoiNumber - MOI number (e.g., "7001396900")
+   * @returns {Object} Profile object containing user ID and other profile information
+   */
+  async loadProfile(userIdNumber, accountMoiNumber) {
+    // Use mock service in demo mode
+    if (process.env.DEMO_MODE === 'true') {
+      const mockProfile = await absherMockService.loadProfile(userIdNumber, accountMoiNumber);
+      return {
+        userId: 'mock-user-id-' + userIdNumber,
+        profile: mockProfile,
+        message: null,
+        actions: []
+      };
+    }
+
+    try {
+      console.log('\n' + '='.repeat(80));
+      console.log('🔍 ABSHER API CALL - Load Profile');
+      console.log('='.repeat(80));
+      console.log(`📋 User ID Number: ${userIdNumber}`);
+      console.log(`📋 Account MOI Number: ${accountMoiNumber}`);
+
+      const config = await this.getConfig();
+      const accessToken = await this.generateAccessToken();
+
+      // LoadProfile API endpoint
+      const apiUrl = `${config.apiUrl}/api/v1/integrator/users/profiles/load`;
+
+      const requestBody = {
+        userIdNumber: userIdNumber,
+        accountMoiNumber: accountMoiNumber
+      };
+
+      console.log(`📤 API URL: ${apiUrl}`);
+      console.log(`📦 Request Body:`, JSON.stringify(requestBody, null, 2));
+      console.log(`🚀 Sending LoadProfile request to Absher API...`);
+
+      const headers = {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      };
+
+      // Add subscription key if available
+      if (config.subscriptionKey) {
+        headers['Ocp-Apim-Subscription-Key'] = config.subscriptionKey;
+      }
+
+      const response = await axios.post(apiUrl, requestBody, {
+        headers: headers,
+        timeout: 60000
+      });
+
+      console.log(`✅ Response received from Absher API`);
+      console.log(`📊 Response Status: ${response.status}`);
+
+      if (response.data) {
+        console.log('📦 LoadProfile API Response:');
+        console.log('='.repeat(80));
+        console.log(JSON.stringify(response.data, null, 2));
+        console.log('='.repeat(80));
+
+        // Extract user ID from response
+        // Response is an array with profile objects
+        if (Array.isArray(response.data) && response.data.length > 0) {
+          const profile = response.data[0];
+          const userId = profile.user?.id;
+
+          if (userId) {
+            console.log(`✅ User ID extracted: ${userId}`);
+            console.log(`   User Email: ${profile.user?.email || 'N/A'}`);
+            console.log(`   User Type: ${profile.user?.userType || 'N/A'}`);
+            console.log(`   Account MOI: ${profile.user?.branch?.account?.moiNumber || 'N/A'}`);
+
+            // Check for any messages or actions required
+            if (profile.message) {
+              console.log('⚠️  Message from API:');
+              console.log(`   AR: ${profile.message.ar || 'N/A'}`);
+              console.log(`   EN: ${profile.message.en || 'N/A'}`);
+            }
+
+            if (profile.actions && profile.actions.length > 0) {
+              console.log('⚠️  Actions required:', profile.actions.join(', '));
+            }
+
+            console.log('='.repeat(80) + '\n');
+
+            return {
+              userId: userId,
+              profile: profile,
+              message: profile.message,
+              actions: profile.actions
+            };
+          } else {
+            throw new Error('User ID not found in LoadProfile response');
+          }
+        } else {
+          throw new Error('Invalid LoadProfile response format');
+        }
+      } else {
+        throw new Error('Empty response from LoadProfile API');
+      }
+    } catch (error) {
+      console.error('\n' + '❌'.repeat(40));
+      console.error(`❌ ERROR LOADING PROFILE`);
+      console.error('❌'.repeat(40));
+      console.error(`Error Message: ${error.message}`);
+
+      if (error.response) {
+        console.error(`Response Status: ${error.response.status}`);
+        console.error(`Response Data:`, JSON.stringify(error.response.data, null, 2));
+      }
+      console.error('❌'.repeat(40) + '\n');
+      throw error;
+    }
+  }
+
+  /**
+   * Get Vehicle Insurance Details from TAMM API
+   * POST /api/v1/inquiry/vehicle-insurance
+   * @param {string} plateNumber - Vehicle plate number (or sequenceNumber if searchType=1)
+   * @param {string} sequenceNumber - Vehicle sequence number (optional, used when searchType=1)
+   */
+  async getVehicleInsuranceDetails(plateNumber, sequenceNumber = null) {
+    // Use mock service in demo mode
+    if (process.env.DEMO_MODE === 'true') {
+      return absherMockService.getVehicleInsurance(plateNumber, sequenceNumber);
+    }
+
+    try {
+      console.log('\n' + '='.repeat(80));
+      console.log(`🔍 ABSHER API CALL - Fetching insurance details`);
+      console.log('='.repeat(80));
+      console.log(`📋 Input Plate Number: ${plateNumber}`);
+      console.log(`📋 Input Sequence Number: ${sequenceNumber}`);
+
+      const config = await this.getConfig();
+      const accessToken = await this.generateAccessToken();
+
+      // TAMM API endpoint for vehicle insurance
+      const apiUrl = `${config.apiUrl}/api/v1/inquiry/vehicle-insurance`;
+
+      // Determine search type based on what's provided
+      // searchType: 0 = by plate, 1 = by sequence number
+      const searchType = sequenceNumber ? 1 : 0;
+
+      // Prepare request payload based on the PDF documentation
+      let plateData;
+
+      if (searchType === 1) {
+        // Search by sequence number
+        plateData = {
+          searchType: 1,
+          sequenceNumber: sequenceNumber,
+          plate: {
+            text1: "",
+            text2: "",
+            text3: "",
+            number: "",
+            type: {}
+          }
+        };
+      } else {
+        // Search by plate number
+        // Parse plate number string (e.g., "أ م ح 9459") into structured format
+        if (typeof plateNumber === 'string') {
+          const parts = plateNumber.trim().split(/\s+/);
+          if (parts.length >= 4) {
+            plateData = {
+              searchType: 0,
+              plate: {
+                text1: parts[0],
+                text2: parts[1],
+                text3: parts[2],
+                number: parseInt(parts[3]) || parts[3],
+                type: {
+                  code: 1,
+                  nameAr: "خاص",
+                  nameEn: "Private Car"
+                }
+              }
+            };
+          } else {
+            throw new Error('Invalid plate number format. Expected format: "text1 text2 text3 number"');
+          }
+        } else {
+          plateData = {
+            searchType: 0,
+            plate: plateNumber
+          };
+        }
+      }
+
+      console.log(`📤 API URL: ${apiUrl}`);
+      console.log(`📦 Request Body:`, JSON.stringify(plateData, null, 2));
+
+      console.log(`🚀 Sending request to Absher API...`);
+
+      const headers = {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Integrator-User-Id': config.integratorUserId // Required for Insurance API
+      };
+
+      // Add subscription key if available
+      if (config.subscriptionKey) {
+        headers['Ocp-Apim-Subscription-Key'] = config.subscriptionKey;
+        console.log(`🔑 Using Subscription Key: ${config.subscriptionKey.substring(0, 8)}...`);
+      }
+
+      console.log(`🔑 Using Integrator User ID: ${config.integratorUserId}`);
+
+      const response = await axios.post(apiUrl, plateData, {
+        headers: headers,
+        timeout: 60000 // Increased timeout to 60 seconds for slow networks
+      });
+
+      console.log(`✅ Response received from Absher API`);
+      console.log(`📊 Response Status: ${response.status}`);
+      console.log(`📦 Response Headers:`, JSON.stringify(response.headers, null, 2));
+
+      if (response.data) {
+        console.log(`✅ Successfully fetched insurance details`);
+        console.log('📦 RAW ABSHER API RESPONSE:');
+        console.log('='.repeat(80));
+        console.log(JSON.stringify(response.data, null, 2));
+        console.log('='.repeat(80));
+
+        const parsedData = this.parseInsuranceData(response.data, plateNumber);
+        console.log('📋 PARSED VEHICLE DATA:');
+        console.log(JSON.stringify(parsedData, null, 2));
+        console.log('='.repeat(80) + '\n');
+
+        return parsedData;
+      } else {
+        throw new Error('Empty response from TAMM API');
+      }
+    } catch (error) {
+      console.error('\n' + '❌'.repeat(40));
+      console.error(`❌ ERROR FETCHING VEHICLE INSURANCE`);
+      console.error('❌'.repeat(40));
+      console.error(`Error Message: ${error.message}`);
+
+      if (error.response) {
+        console.error(`Response Status: ${error.response.status}`);
+        console.error(`Response Headers:`, JSON.stringify(error.response.headers, null, 2));
+        console.error(`Response Data:`, JSON.stringify(error.response.data, null, 2));
+      } else if (error.request) {
+        console.error(`Request was made but no response received`);
+        console.error(`Request details:`, error.request);
+      } else {
+        console.error(`Error details:`, error);
+      }
+      console.error('❌'.repeat(40) + '\n');
+      throw error;
+    }
+  }
+
+  /**
+   * Get MVPI (Vehicle Inspection) Details from TAMM API
+   * POST /api/v1/inquiry/mvpi/latest-inspection
+   * @param {string} plateNumber - Vehicle plate number (or sequenceNumber if searchType=1)
+   * @param {string} sequenceNumber - Vehicle sequence number (optional, used when searchType=1)
+   */
+  async getMVPIDetails(plateNumber, sequenceNumber = null) {
+    // Use mock service in demo mode
+    if (process.env.DEMO_MODE === 'true') {
+      return absherMockService.getVehicleInspection(plateNumber, sequenceNumber);
+    }
+
+    try {
+      console.log('\n' + '='.repeat(80));
+      console.log(`🔍 ABSHER API CALL - Fetching MVPI details`);
+      console.log('='.repeat(80));
+      console.log(`📋 Input Plate Number: ${plateNumber}`);
+      console.log(`📋 Input Sequence Number: ${sequenceNumber}`);
+
+      const config = await this.getConfig();
+      const accessToken = await this.generateAccessToken();
+
+      // TAMM API endpoint for MVPI
+      const apiUrl = `${config.apiUrl}/api/v1/inquiry/mvpi/latest-inspection`;
+
+      // Determine search type based on what's provided
+      // searchType: 0 = by plate, 1 = by sequence number
+      const searchType = sequenceNumber ? 1 : 0;
+
+      // Prepare request payload based on the PDF documentation
+      let plateData;
+
+      if (searchType === 1) {
+        // Search by sequence number
+        plateData = {
+          searchType: 1,
+          sequenceNumber: sequenceNumber,
+          plate: {
+            text1: "",
+            text2: "",
+            text3: "",
+            number: "",
+            type: {}
+          }
+        };
+      } else {
+        // Search by plate number
+        // Parse plate number string (e.g., "أ م ح 9459") into structured format
+        if (typeof plateNumber === 'string') {
+          const parts = plateNumber.trim().split(/\s+/);
+          if (parts.length >= 4) {
+            plateData = {
+              searchType: 0,
+              plate: {
+                text1: parts[0],
+                text2: parts[1],
+                text3: parts[2],
+                number: parseInt(parts[3]) || parts[3],
+                type: {
+                  code: 1,
+                  nameAr: "خاص",
+                  nameEn: "Private Car"
+                }
+              }
+            };
+          } else {
+            throw new Error('Invalid plate number format. Expected format: "text1 text2 text3 number"');
+          }
+        } else {
+          plateData = {
+            searchType: 0,
+            plate: plateNumber
+          };
+        }
+      }
+
+      console.log(`📤 API URL: ${apiUrl}`);
+      console.log(`📦 Request Body:`, JSON.stringify(plateData, null, 2));
+      console.log(`🚀 Sending request to Absher API...`);
+
+      const headers = {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Integrator-User-Id': config.integratorUserId // Required for MVPI API
+      };
+
+      // Add subscription key if available
+      if (config.subscriptionKey) {
+        headers['Ocp-Apim-Subscription-Key'] = config.subscriptionKey;
+        console.log(`🔑 Using Subscription Key: ${config.subscriptionKey.substring(0, 8)}...`);
+      }
+
+      console.log(`🔑 Using Integrator User ID: ${config.integratorUserId}`);
+
+      const response = await axios.post(apiUrl, plateData, {
+        headers: headers,
+        timeout: 60000 // Increased timeout to 60 seconds for slow networks
+      });
+
+      console.log(`✅ Response received from Absher API`);
+      console.log(`📊 Response Status: ${response.status}`);
+
+      if (response.data) {
+        console.log(`✅ Successfully fetched MVPI details`);
+        console.log('📦 RAW ABSHER API RESPONSE:');
+        console.log('='.repeat(80));
+        console.log(JSON.stringify(response.data, null, 2));
+        console.log('='.repeat(80) + '\n');
+        return response.data;
+      } else {
+        throw new Error('Empty response from TAMM API');
+      }
+    } catch (error) {
+      console.error('\n' + '❌'.repeat(40));
+      console.error(`❌ ERROR FETCHING MVPI DETAILS`);
+      console.error('❌'.repeat(40));
+      console.error(`Error Message: ${error.message}`);
+
+      if (error.response) {
+        console.error(`Response Status: ${error.response.status}`);
+        console.error(`Response Data:`, JSON.stringify(error.response.data, null, 2));
+      }
+      console.error('❌'.repeat(40) + '\n');
+      throw error;
+    }
+  }
+
+  /**
+   * STEP 1: Verify Vehicle for Istemarah Renewal
+   * POST /api/v1/istemarah/renewal/verify
+   * Returns conversationId needed for step 2
+   * @param {Object} plateNumber - Vehicle plate number (can be string or object)
+   */
+  async verifyIstemarahRenewal(plateNumber) {
+    try {
+      console.log('\n' + '='.repeat(80));
+      console.log(`🔄 ABSHER API CALL - Step 1: Verify Vehicle for Istemarah Renewal`);
+      console.log('='.repeat(80));
+      console.log(`📋 Input Plate Number: ${JSON.stringify(plateNumber)}`);
+
+      const config = await this.getConfig();
+      const accessToken = await this.generateAccessToken();
+
+      // TAMM API endpoint for Istemarah renewal verification
+      const apiUrl = `${config.apiUrl}/api/v1/istemarah/renewal/verify`;
+
+      // Prepare plate object based on the documentation
+      let plateDto;
+      if (typeof plateNumber === 'string') {
+        const parts = plateNumber.trim().split(/\s+/);
+        if (parts.length >= 4) {
+          plateDto = {
+            text1: parts[0],
+            text2: parts[1],
+            text3: parts[2],
+            number: parseInt(parts[3]) || parts[3],
+            type: {
+              code: 1
+            }
+          };
+        } else {
+          throw new Error('Invalid plate number format. Expected format: "text1 text2 text3 number"');
+        }
+      } else {
+        plateDto = plateNumber;
+      }
+
+      const requestBody = {
+        plateDto: plateDto
+      };
+
+      console.log(`📤 API URL: ${apiUrl}`);
+      console.log(`📦 Request Body:`, JSON.stringify(requestBody, null, 2));
+      console.log(`🚀 Sending verification request to Absher API...`);
+
+      const headers = {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      };
+
+      // Add subscription key if available
+      if (config.subscriptionKey) {
+        headers['Ocp-Apim-Subscription-Key'] = config.subscriptionKey;
+      }
+
+      const response = await axios.post(apiUrl, requestBody, {
+        headers: headers,
+        timeout: 60000 // Increased timeout to 60 seconds for slow networks
+      });
+
+      console.log(`✅ Response received from Absher API`);
+      console.log(`📊 Response Status: ${response.status}`);
+
+      if (response.data) {
+        console.log(`✅ Successfully verified vehicle for renewal`);
+        console.log('📦 RAW ABSHER API RESPONSE:');
+        console.log('='.repeat(80));
+        console.log(JSON.stringify(response.data, null, 2));
+        console.log('='.repeat(80) + '\n');
+
+        // Extract conversationId for next step
+        const conversationId = response.data.id || response.data.conversationId;
+        if (!conversationId) {
+          throw new Error('No conversationId returned from verification API');
+        }
+
+        return {
+          conversationId: conversationId,
+          vehicleInfo: response.data.vehicleDtoView,
+          ownerIdNumber: response.data.ownerIdNumber,
+          ownerName: response.data.ownerName,
+          price: response.data.price,
+          rawResponse: response.data
+        };
+      } else {
+        throw new Error('Empty response from TAMM API');
+      }
+    } catch (error) {
+      console.error('\n' + '❌'.repeat(40));
+      console.error(`❌ ERROR VERIFYING VEHICLE FOR RENEWAL`);
+      console.error('❌'.repeat(40));
+      console.error(`Error Message: ${error.message}`);
+
+      if (error.response) {
+        console.error(`Response Status: ${error.response.status}`);
+        console.error(`Response Data:`, JSON.stringify(error.response.data, null, 2));
+      }
+      console.error('❌'.repeat(40) + '\n');
+      throw error;
+    }
+  }
+
+  /**
+   * STEP 2: Submit Istemarah Renewal
+   * POST /api/v1/istemarah/renewal/
+   * Requires conversationId from step 1
+   * @param {string} conversationId - Conversation ID from verify step
+   * @param {string} ownerMobileNumber - Owner's mobile number
+   * @param {string} integratorUserId - Integrator user ID (optional)
+   */
+  async submitIstemarahRenewal(conversationId, ownerMobileNumber, integratorUserId = null) {
+    try {
+      console.log('\n' + '='.repeat(80));
+      console.log(`🔄 ABSHER API CALL - Step 2: Submit Istemarah Renewal`);
+      console.log('='.repeat(80));
+      console.log(`📋 Conversation ID: ${conversationId}`);
+      console.log(`📋 Mobile Number: ${ownerMobileNumber}`);
+
+      const config = await this.getConfig();
+      const accessToken = await this.generateAccessToken();
+
+      // TAMM API endpoint for Istemarah renewal submission
+      const apiUrl = `${config.apiUrl}/api/v1/istemarah/renewal/`;
+
+      const requestBody = {
+        ownerMobileNumber: ownerMobileNumber
+      };
+
+      console.log(`📤 API URL: ${apiUrl}`);
+      console.log(`📦 Request Body:`, JSON.stringify(requestBody, null, 2));
+      console.log(`🚀 Sending renewal submission to Absher API...`);
+
+      const headers = {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Conversation-Id': conversationId
+      };
+
+      // Add integrator user ID if provided
+      if (integratorUserId) {
+        headers['X-Integrator-User-Id'] = integratorUserId;
+        console.log(`🔑 Using Integrator User ID: ${integratorUserId}`);
+      }
+
+      // Add subscription key if available
+      if (config.subscriptionKey) {
+        headers['Ocp-Apim-Subscription-Key'] = config.subscriptionKey;
+      }
+
+      const response = await axios.post(apiUrl, requestBody, {
+        headers: headers,
+        timeout: 60000 // Increased timeout to 60 seconds for slow networks
+      });
+
+      console.log(`✅ Response received from Absher API`);
+      console.log(`📊 Response Status: ${response.status}`);
+
+      if (response.status === 200) {
+        console.log(`✅ Successfully submitted Istemarah renewal`);
+        console.log('📦 RAW ABSHER API RESPONSE:');
+        console.log('='.repeat(80));
+        console.log(JSON.stringify(response.data, null, 2));
+        console.log('='.repeat(80) + '\n');
+
+        return {
+          success: true,
+          status: response.status,
+          conversationId: conversationId,
+          rawResponse: response.data
+        };
+      } else {
+        throw new Error(`Unexpected status code: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('\n' + '❌'.repeat(40));
+      console.error(`❌ ERROR SUBMITTING ISTEMARAH RENEWAL`);
+      console.error('❌'.repeat(40));
+      console.error(`Error Message: ${error.message}`);
+
+      if (error.response) {
+        console.error(`Response Status: ${error.response.status}`);
+        console.error(`Response Data:`, JSON.stringify(error.response.data, null, 2));
+      }
+      console.error('❌'.repeat(40) + '\n');
+      throw error;
+    }
+  }
+
+  /**
+   * STEP 3: Search Renewed Istemarah Records
+   * POST /api/v1/istemarah/renewal/client-search?page=0&size=10
+   * @param {string} plateInfo - Plate info string (e.g., "ببأ_7562_1")
+   * @param {string} integratorUserId - Integrator user ID
+   * @param {number} page - Page number (default: 0)
+   * @param {number} size - Page size (default: 10)
+   */
+  async searchRenewedIstemarah(plateInfo, integratorUserId, page = 0, size = 10) {
+    try {
+      console.log('\n' + '='.repeat(80));
+      console.log(`🔍 ABSHER API CALL - Step 3: Search Renewed Istemarah`);
+      console.log('='.repeat(80));
+      console.log(`📋 Plate Info: ${plateInfo}`);
+      console.log(`📋 Page: ${page}, Size: ${size}`);
+
+      const config = await this.getConfig();
+      const accessToken = await this.generateAccessToken();
+
+      // TAMM API endpoint for Istemarah renewal search
+      const apiUrl = `${config.apiUrl}/api/v1/istemarah/renewal/client-search?page=${page}&size=${size}`;
+
+      const requestBody = {
+        "$and": [
+          { "plateInfo": plateInfo }
+        ]
+      };
+
+      console.log(`📤 API URL: ${apiUrl}`);
+      console.log(`📦 Request Body:`, JSON.stringify(requestBody, null, 2));
+      console.log(`🚀 Sending search request to Absher API...`);
+
+      const headers = {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Integrator-User-Id': integratorUserId
+      };
+
+      // Add subscription key if available
+      if (config.subscriptionKey) {
+        headers['Ocp-Apim-Subscription-Key'] = config.subscriptionKey;
+      }
+
+      const response = await axios.post(apiUrl, requestBody, {
+        headers: headers,
+        timeout: 60000 // Increased timeout to 60 seconds for slow networks
+      });
+
+      console.log(`✅ Response received from Absher API`);
+      console.log(`📊 Response Status: ${response.status}`);
+
+      if (response.data) {
+        console.log(`✅ Successfully fetched renewed Istemarah records`);
+        console.log('📦 RAW ABSHER API RESPONSE:');
+        console.log('='.repeat(80));
+        console.log(JSON.stringify(response.data, null, 2));
+        console.log('='.repeat(80) + '\n');
+
+        return response.data;
+      } else {
+        throw new Error('Empty response from TAMM API');
+      }
+    } catch (error) {
+      console.error('\n' + '❌'.repeat(40));
+      console.error(`❌ ERROR SEARCHING RENEWED ISTEMARAH`);
+      console.error('❌'.repeat(40));
+      console.error(`Error Message: ${error.message}`);
+
+      if (error.response) {
+        console.error(`Response Status: ${error.response.status}`);
+        console.error(`Response Data:`, JSON.stringify(error.response.data, null, 2));
+      }
+      console.error('❌'.repeat(40) + '\n');
+      throw error;
+    }
+  }
+
+  /**
+   * Search ALL Istemarah Records (no filter)
+   * POST /api/v1/istemarah/renewal/client-search?page=0&size=10
+   * Fetches all Istemarah records without any filter
+   * @param {string} integratorUserId - Integrator user ID (uses config value if not provided)
+   * @param {number} page - Page number (default: 0)
+   * @param {number} size - Page size (default: 10)
+   */
+  async searchAllIstemarah(integratorUserId = null, page = 0, size = 10) {
+    try {
+      console.log('\n' + '='.repeat(80));
+      console.log(`🔍 ABSHER API CALL - Search ALL Istemarah Records`);
+      console.log('='.repeat(80));
+      const config = await this.getConfig();
+
+      // Use config value if not provided
+      if (!integratorUserId) {
+        integratorUserId = config.integratorUserId;
+      }
+
+      console.log(`📋 Integrator User ID: ${integratorUserId}`);
+      console.log(`📋 Page: ${page}, Size: ${size}`);
+
+      const accessToken = await this.generateAccessToken();
+
+      // TAMM API endpoint for Istemarah renewal search
+      const apiUrl = `${config.apiUrl}/api/v1/istemarah/renewal/client-search?page=${page}&size=${size}`;
+
+      // Empty filter to get all records
+      const requestBody = {
+        "$and": []
+      };
+
+      console.log(`📤 API URL: ${apiUrl}`);
+      console.log(`📦 Request Body:`, JSON.stringify(requestBody, null, 2));
+      console.log(`🚀 Sending request to fetch ALL Istemarah records...`);
+
+      const headers = {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'X-Integrator-User-Id': integratorUserId
+      };
+
+      // Add subscription key if available
+      if (config.subscriptionKey) {
+        headers['Ocp-Apim-Subscription-Key'] = config.subscriptionKey;
+      }
+
+      const response = await axios.post(apiUrl, requestBody, {
+        headers: headers,
+        timeout: 60000 // 60 seconds timeout
+      });
+
+      console.log(`✅ Response received from Absher API`);
+      console.log(`📊 Response Status: ${response.status}`);
+
+      if (response.data) {
+        console.log(`✅ Successfully fetched all Istemarah records`);
+        console.log(`📊 Total Elements: ${response.data.totalElements || 0}`);
+        console.log(`📊 Total Pages: ${response.data.totalPages || 0}`);
+        console.log(`📊 Current Page: ${response.data.number || 0}`);
+        console.log(`📊 Records in this page: ${response.data.content?.length || 0}`);
+        console.log('📦 RAW ABSHER API RESPONSE:');
+        console.log('='.repeat(80));
+        console.log(JSON.stringify(response.data, null, 2));
+        console.log('='.repeat(80) + '\n');
+
+        return response.data;
+      } else {
+        throw new Error('Empty response from TAMM API');
+      }
+    } catch (error) {
+      console.error('\n' + '❌'.repeat(40));
+      console.error(`❌ ERROR SEARCHING ALL ISTEMARAH RECORDS`);
+      console.error('❌'.repeat(40));
+      console.error(`Error Message: ${error.message}`);
+
+      if (error.response) {
+        console.error(`Response Status: ${error.response.status}`);
+        console.error(`Response Data:`, JSON.stringify(error.response.data, null, 2));
+      }
+      console.error('❌'.repeat(40) + '\n');
+      throw error;
+    }
+  }
+
+  /**
+   * Complete Istemarah Renewal Workflow (All 3 Steps)
+   * @param {Object} plateNumber - Vehicle plate number
+   * @param {string} ownerMobileNumber - Owner's mobile number
+   * @param {string} integratorUserId - Integrator user ID (optional)
+   */
+  async completeIstemarahRenewal(plateNumber, ownerMobileNumber, integratorUserId = null) {
+    try {
+      console.log('\n' + '🔄'.repeat(40));
+      console.log(`🔄 COMPLETE ISTEMARAH RENEWAL WORKFLOW`);
+      console.log('🔄'.repeat(40));
+
+      // Step 1: Verify vehicle
+      console.log(`\n📍 STEP 1/3: Verifying vehicle...`);
+      const verifyResult = await this.verifyIstemarahRenewal(plateNumber);
+      console.log(`✅ Step 1 complete. Conversation ID: ${verifyResult.conversationId}`);
+
+      // Step 2: Submit renewal
+      console.log(`\n📍 STEP 2/3: Submitting renewal...`);
+      const submitResult = await this.submitIstemarahRenewal(
+        verifyResult.conversationId,
+        ownerMobileNumber,
+        integratorUserId
+      );
+      console.log(`✅ Step 2 complete. Status: ${submitResult.status}`);
+
+      // Step 3: Search for renewed record (optional, for confirmation)
+      console.log(`\n📍 STEP 3/3: Searching renewed record...`);
+      const plateInfo = typeof plateNumber === 'string'
+        ? plateNumber.replace(/\s+/g, '_')
+        : `${plateNumber.text1}_${plateNumber.number}_${plateNumber.text2}`;
+
+      let searchResult = null;
+      if (integratorUserId) {
+        try {
+          searchResult = await this.searchRenewedIstemarah(plateInfo, integratorUserId);
+          console.log(`✅ Step 3 complete. Found ${searchResult.totalElements || 0} records`);
+        } catch (error) {
+          console.log(`⚠️ Step 3 search failed (non-critical): ${error.message}`);
+        }
+      }
+
+      console.log('\n' + '✅'.repeat(40));
+      console.log(`✅ ISTEMARAH RENEWAL COMPLETED SUCCESSFULLY`);
+      console.log('✅'.repeat(40) + '\n');
+
+      return {
+        success: true,
+        verifyResult: verifyResult,
+        submitResult: submitResult,
+        searchResult: searchResult
+      };
+    } catch (error) {
+      console.error('\n' + '❌'.repeat(40));
+      console.error(`❌ COMPLETE ISTEMARAH RENEWAL FAILED`);
+      console.error('❌'.repeat(40));
+      console.error(`Error: ${error.message}`);
+      console.error('❌'.repeat(40) + '\n');
+      throw error;
+    }
+  }
+
+  /**
+   * Parse Istemarah renewal response
+   */
+  parseIstemarahRenewalResponse(tammData, plateNumber, sequenceNumber) {
+    try {
+      return {
+        plateNumber: typeof plateNumber === 'string' ? plateNumber :
+          `${plateNumber.text1} ${plateNumber.text2} ${plateNumber.text3} ${plateNumber.number}`,
+        sequenceNumber: sequenceNumber,
+        renewalRequestId: tammData.requestId || tammData.id || null,
+        renewalStatus: tammData.status || 'pending',
+        renewalFees: tammData.fees || tammData.totalAmount || null,
+        renewalExpiryDate: this.parseDate(tammData.expiryDate || tammData.renewalDate),
+        renewalResponse: tammData,
+        lastRenewalRequestDate: new Date(),
+        dataSource: 'absher'
+      };
+    } catch (error) {
+      console.error('Error parsing Istemarah renewal response:', error);
+      throw new Error('Failed to parse renewal response from TAMM API');
+    }
+  }
+
+  /**
+   * Parse and map TAMM API insurance response to our Vehicle model format
+   */
+  parseInsuranceData(tammData, originalPlate) {
+    try {
+      // Based on the documentation, the response has a 'list' array
+      const insuranceList = tammData.list || [];
+      const firstInsurance = insuranceList[0] || {};
+
+      return {
+        // Keep original plate number (it's a string like "أ م ح 9459")
+        plateNumber: typeof originalPlate === 'string'
+          ? originalPlate
+          : (originalPlate.text1 && originalPlate.text2 && originalPlate.text3 && originalPlate.number
+              ? `${originalPlate.text1} ${originalPlate.text2} ${originalPlate.text3} ${originalPlate.number}`
+              : originalPlate),
+
+        // Insurance details from TAMM API
+        insuranceCompany: firstInsurance.insuranceCompanyName || null,
+        insurancePolicyNumber: firstInsurance.mainPolicyNumber || null,
+        insuranceExpiryDate: this.parseDate(firstInsurance.policyEndDate),
+        insuranceStatus: firstInsurance.policyStatus || null,
+
+        // Metadata
+        lastSyncDate: new Date(),
+        dataSource: 'absher'
+      };
+    } catch (error) {
+      console.error('Error parsing TAMM insurance data:', error);
+      throw new Error('Failed to parse vehicle data from TAMM response');
+    }
+  }
+
+  /**
+   * Parse date from various formats
+   */
+  parseDate(dateString) {
+    if (!dateString) return null;
+
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return null;
+      return date;
+    } catch (error) {
+      console.error('Error parsing date:', dateString);
+      return null;
+    }
+  }
+
+  /**
+   * Test connection to TAMM API
+   */
+  async testConnection() {
+    try {
+      console.log('🧪 Testing TAMM API connection...');
+      const token = await this.generateAccessToken();
+
+      if (token) {
+        console.log('✅ TAMM API connection test successful');
+        return { success: true, message: 'Connection successful', token: token.substring(0, 20) + '...' };
+      } else {
+        throw new Error('Failed to obtain access token');
+      }
+    } catch (error) {
+      console.error('❌ TAMM API connection test failed:', error.message);
+      return { success: false, message: error.message };
+    }
+  }
+
+  /**
+   * Clear cached token (useful when credentials are updated)
+   */
+  clearCache() {
+    this.accessToken = null;
+    this.tokenExpiry = null;
+    console.log('🗑️ Token cache cleared');
+  }
+}
+
+module.exports = new TammService();

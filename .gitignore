@@ -1,0 +1,84 @@
+# Environment Variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.env
+
+# Exclude example env files from ignore
+!.env.example
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Build outputs
+dist/
+build/
+*.log
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+tmp/
+temp/
+nul
+
+# Database files
+*.sqlite
+*.db
+
+# Database backups
+backend/backups/backup-*
+backend/backups/*.json
+!backend/backups/.gitkeep
+
+# Uploaded files (if any)
+uploads/
+
+# Data folder (PDFs, images, documentation)
+data/
+
+# Test and debug files
+backend/test-*.js
+backend/*-test.js
+
+# Documentation that shouldn't be in repo (private/sensitive)
+*.pdf
+*.PDF
+GOSI_SETUP.md
+DEPLOY_RENDER.md
+DEPLOY_VERCEL.md
+
+# Allow important markdown files for portfolio
+!README.md
+!ARCHITECTURE.md
+!DEMO_GUIDE.md
+!API_INTEGRATION.md
+!LICENSE.md
+!CONTRIBUTING.md
+!CHANGELOG.md
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Misc
+.cache/
+.parcel-cache/
