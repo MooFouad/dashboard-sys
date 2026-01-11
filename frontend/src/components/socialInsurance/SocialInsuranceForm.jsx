@@ -35,7 +35,34 @@ const SocialInsuranceForm = ({ onSubmit, onCancel, initialData = null }) => {
       return;
     }
 
-    onSubmit(formData);
+    // Calculate remainingDays and status
+    let remainingDays = null;
+    let status = null;
+
+    if (formData.endDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const endDate = new Date(formData.endDate);
+      endDate.setHours(0, 0, 0, 0);
+
+      remainingDays = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+
+      if (remainingDays < 0) {
+        status = 'expired';
+      } else if (remainingDays <= 30) {
+        status = 'expiring-soon';
+      } else {
+        status = 'active';
+      }
+    }
+
+    const submissionData = {
+      ...formData,
+      remainingDays,
+      status
+    };
+
+    onSubmit(submissionData);
   };
 
   const handleChange = (field, value) => {
@@ -49,7 +76,7 @@ const SocialInsuranceForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="Employee Name">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.name}
             onChange={(e) => handleChange('name', e.target.value)}
             placeholder="Enter employee name"
@@ -60,7 +87,7 @@ const SocialInsuranceForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="ID Number (NIN/Iqama)">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.nin}
             onChange={(e) => handleChange('nin', e.target.value)}
             placeholder="e.g., 1234567890"
@@ -71,7 +98,7 @@ const SocialInsuranceForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="Division/Department">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.division}
             onChange={(e) => handleChange('division', e.target.value)}
             placeholder="e.g., IT Department"
@@ -82,7 +109,7 @@ const SocialInsuranceForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="Start Date">
           <input
             type="date"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.startDate}
             onChange={(e) => handleChange('startDate', e.target.value)}
           />
@@ -92,7 +119,7 @@ const SocialInsuranceForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="End Date">
           <input
             type="date"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.endDate}
             onChange={(e) => handleChange('endDate', e.target.value)}
           />
@@ -102,7 +129,7 @@ const SocialInsuranceForm = ({ onSubmit, onCancel, initialData = null }) => {
       {/* Notes - Full width */}
       <FormField label="Notes (Optional)">
         <textarea
-          className="w-full border rounded px-3 py-2"
+          className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
           value={formData.notes}
           onChange={(e) => handleChange('notes', e.target.value)}
           placeholder="Additional notes..."

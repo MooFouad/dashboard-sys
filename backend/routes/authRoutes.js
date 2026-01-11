@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const { body } = require('express-validator');
 const User = require('../models/User');
 const { AppError } = require('../middleware/errorHandler');
 const validate = require('../middleware/validate');
 const { authenticate } = require('../middleware/auth');
+const mockDataService = require('../services/mockDataService');
 
 // Generate JWT token
 const generateToken = (userId, isGuest = false) => {
@@ -34,6 +36,43 @@ router.post('/register', registerValidation, validate, async (req, res, next) =>
   try {
     const { email, password, name, role } = req.body;
 
+    // Use mock data in demo mode
+    if (process.env.USE_MOCK_DATA === 'true') {
+      // Check if user already exists
+      const existingUser = await mockDataService.findOne('users', { email });
+      if (existingUser) {
+        return next(new AppError('Email already registered', 400));
+      }
+
+      // Create new user with hashed password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = await mockDataService.create('users', {
+        email,
+        password: hashedPassword,
+        name,
+        role: role || 'user',
+        isActive: true
+      });
+
+      // Generate token
+      const token = generateToken(newUser._id);
+
+      return res.status(201).json({
+        success: true,
+        message: 'User registered successfully',
+        data: {
+          user: {
+            id: newUser._id,
+            email: newUser.email,
+            name: newUser.name,
+            role: newUser.role
+          },
+          token
+        }
+      });
+    }
+
+    // MongoDB fallback for production
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -76,9 +115,49 @@ router.post('/login', loginValidation, validate, async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
+    // Use mock data in demo mode
+    if (process.env.USE_MOCK_DATA === 'true') {
+      // Find user in mock data
+      const user = await mockDataService.findOne('users', { email });
+
+      if (!user) {
+        return next(new AppError('Invalid email or password', 401));
+      }
+
+      // Check if account is active
+      if (!user.isActive) {
+        return next(new AppError('Account is deactivated', 401));
+      }
+
+      // Verify password
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (!isPasswordValid) {
+        return next(new AppError('Invalid email or password', 401));
+      }
+
+      // Generate token
+      const token = generateToken(user._id);
+
+      return res.json({
+        success: true,
+        message: 'Login successful',
+        data: {
+          user: {
+            id: user._id,
+            email: user.email,
+            name: user.name,
+            role: user.role
+          },
+          token
+        }
+      });
+    }
+
+    // MongoDB fallback for production
     // Find user
     const user = await User.findOne({ email }).select('+password');
-    
+
     if (!user) {
       return next(new AppError('Invalid email or password', 401));
     }
@@ -90,7 +169,7 @@ router.post('/login', loginValidation, validate, async (req, res, next) => {
 
     // Verify password
     const isPasswordValid = await user.comparePassword(password);
-    
+
     if (!isPasswordValid) {
       return next(new AppError('Invalid email or password', 401));
     }

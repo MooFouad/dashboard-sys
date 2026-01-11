@@ -10,9 +10,8 @@ const gosiSchema = new mongoose.Schema({
   nin: {
     type: String,
     required: true,
-    unique: true,
-    trim: true,
-    index: true
+    unique: true, // This creates an index automatically
+    trim: true
   },
 
   // Employee Name
@@ -160,8 +159,7 @@ gosiSchema.virtual('daysUntilEnd').get(function() {
   return diffDays;
 });
 
-// Indexes for performance
-gosiSchema.index({ nin: 1 });
+// Indexes for performance (nin already has unique index from schema)
 gosiSchema.index({ engagementStartDate: 1 });
 gosiSchema.index({ engagementEndDate: 1 });
 gosiSchema.index({ status: 1 });

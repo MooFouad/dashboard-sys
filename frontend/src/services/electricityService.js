@@ -1,4 +1,5 @@
 import api from './api';
+import localStorageService from './localStorageService';
 
 const electricityService = {
   // Get all electricity bills
@@ -28,7 +29,8 @@ const electricityService = {
 
   // Get count
   getCount: async () => {
-    return await api.get('/electricity/count/total');
+    const items = localStorageService.findAll('electricity');
+    return { count: items ? items.length : 0 };
   },
 
   // Search electricity bills

@@ -64,7 +64,9 @@
       "Bash(del:*)",
       "Bash(rm:*)",
       "Bash(git reset:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(wc:*)",
+      "Bash(timeout /t 3)"
     ],
     "deny": [],
     "ask": []

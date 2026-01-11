@@ -18,13 +18,13 @@ const SocialInsuranceTable = ({ data, onEdit, onDelete }) => {
 
   const getStatusBadge = (status) => {
     const statusColors = {
-      'active': 'bg-green-100 text-green-800',
-      'expiring-soon': 'bg-yellow-100 text-yellow-800',
-      'expired': 'bg-red-100 text-red-800'
+      'active': 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300',
+      'expiring-soon': 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-300',
+      'expired': 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300'
     };
 
     return (
-      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColors[status] || 'bg-gray-100 text-gray-800'}`}>
+      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColors[status] || 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300'}`}>
         {status || 'N/A'}
       </span>
     );
@@ -32,59 +32,59 @@ const SocialInsuranceTable = ({ data, onEdit, onDelete }) => {
 
   return (
     <ScrollableTableWrapper>
-      <table className="min-w-full bg-white border border-gray-200">
-        <thead className="bg-gray-50">
+      <table className="min-w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
+        <thead className="bg-gray-50 dark:bg-gray-800">
           <tr>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b dark:border-gray-700">
               Name
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b dark:border-gray-700">
               ID Number
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b dark:border-gray-700">
               Division
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b dark:border-gray-700">
               Start Date
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b dark:border-gray-700">
               End Date
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b dark:border-gray-700">
               Remaining Days
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b dark:border-gray-700">
               Status
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b dark:border-gray-700">
               Actions
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
           {data.length === 0 ? (
             <tr>
-              <td colSpan="8" className="px-4 py-8 text-center text-gray-500">
+              <td colSpan="8" className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                 No social insurance records found. Click "Add New" to create one.
               </td>
             </tr>
           ) : (
             data.map((record) => {
               return (
-                <tr key={record._id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                <tr key={record._id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                     {record.name || '-'}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {record.nin || '-'}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {record.division || '-'}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {formatDate(record.startDate)}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {formatDate(record.endDate)}
                   </td>
                   <td className={`px-4 py-3 whitespace-nowrap text-sm ${getRemainingDaysColor(record.remainingDays)}`}>

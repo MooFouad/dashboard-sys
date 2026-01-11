@@ -30,6 +30,9 @@ build/
 *~
 .DS_Store
 
+# Claude Code Configuration
+.claude_rules
+
 # OS files
 Thumbs.db
 Desktop.ini
@@ -54,6 +57,11 @@ uploads/
 
 # Data folder (PDFs, images, documentation)
 data/
+
+# IMPORTANT: Allow mock data for demo/portfolio mode
+!backend/data/
+!backend/data/mock/
+!backend/data/mock/*.json
 
 # Test and debug files
 backend/test-*.js

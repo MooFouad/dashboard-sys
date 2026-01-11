@@ -1,4 +1,5 @@
 import api from './api';
+import localStorageService from './localStorageService';
 
 const socialInsuranceService = {
   // Get all social insurance records
@@ -33,7 +34,8 @@ const socialInsuranceService = {
 
   // Get count
   getCount: async () => {
-    return await api.get('/social-insurance/count/total');
+    const items = localStorageService.findAll('socialInsurance');
+    return { count: items ? items.length : 0 };
   }
 };
 

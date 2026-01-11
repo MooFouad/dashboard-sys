@@ -30,6 +30,13 @@ const GOSIContainer = () => {
     usePagination: false
   });
 
+  // Dispatch count update when items change
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('itemCountUpdate', {
+      detail: { type: 'gosi', count: items.length }
+    }));
+  }, [items]);
+
   // Calculate actual status based on engagement dates
   const getActualStatus = (item) => {
     const today = new Date();

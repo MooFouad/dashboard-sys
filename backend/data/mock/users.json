@@ -1,0 +1,29 @@
+[
+  {
+    "_id": "demo-admin-001",
+    "email": "demo@gts-demo.com",
+    "password": "$2b$10$TlH2rclk/SVi79i1IPNRUO2O3jL52e/EIsG0TXOxgvmlZajWpVY/S",
+    "name": "Demo Admin",
+    "role": "admin",
+    "isActive": true,
+    "createdAt": "2024-01-15T10:00:00.000Z"
+  },
+  {
+    "_id": "demo-user-001",
+    "email": "user@gts-demo.com",
+    "password": "$2b$10$TlH2rclk/SVi79i1IPNRUO2O3jL52e/EIsG0TXOxgvmlZajWpVY/S",
+    "name": "Demo User",
+    "role": "user",
+    "isActive": true,
+    "createdAt": "2024-01-15T10:00:00.000Z"
+  },
+  {
+    "_id": "demo-viewer-001",
+    "email": "viewer@gts-demo.com",
+    "password": "$2b$10$TlH2rclk/SVi79i1IPNRUO2O3jL52e/EIsG0TXOxgvmlZajWpVY/S",
+    "name": "Demo Viewer",
+    "role": "viewer",
+    "isActive": true,
+    "createdAt": "2024-01-15T10:00:00.000Z"
+  }
+]

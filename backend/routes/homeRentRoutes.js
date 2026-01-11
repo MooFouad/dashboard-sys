@@ -119,6 +119,16 @@ router.get('/:id', async (req, res, next) => {
 // CREATE home rent
 router.post('/', createHomeRentValidator, validate, async (req, res, next) => {
   try {
+    // Use mock data in demo mode
+    if (process.env.USE_MOCK_DATA === 'true') {
+      const newRent = await mockDataService.create('homeRents', req.body);
+      return res.status(201).json({
+        success: true,
+        message: 'Home rent created successfully',
+        data: newRent
+      });
+    }
+
     const homeRent = new HomeRent(req.body);
     await homeRent.save();
     res.status(201).json({
@@ -134,6 +144,19 @@ router.post('/', createHomeRentValidator, validate, async (req, res, next) => {
 // UPDATE home rent
 router.put('/:id', updateHomeRentValidator, validate, async (req, res, next) => {
   try {
+    // Use mock data in demo mode
+    if (process.env.USE_MOCK_DATA === 'true') {
+      const updatedRent = await mockDataService.update('homeRents', req.params.id, req.body);
+      if (!updatedRent) {
+        return next(new AppError('Home rent not found', 404));
+      }
+      return res.json({
+        success: true,
+        message: 'Home rent updated successfully',
+        data: updatedRent
+      });
+    }
+
     const existingRent = await HomeRent.findById(req.params.id);
     if (!existingRent) {
       return next(new AppError('Home rent not found', 404));
@@ -158,6 +181,19 @@ router.put('/:id', updateHomeRentValidator, validate, async (req, res, next) => 
 // DELETE home rent
 router.delete('/:id', deleteHomeRentValidator, validate, async (req, res, next) => {
   try {
+    // Use mock data in demo mode
+    if (process.env.USE_MOCK_DATA === 'true') {
+      const deleted = await mockDataService.delete('homeRents', req.params.id);
+      if (!deleted) {
+        return next(new AppError('Home rent not found', 404));
+      }
+      return res.json({
+        success: true,
+        message: 'Home rent deleted successfully',
+        data: { id: req.params.id }
+      });
+    }
+
     const result = await HomeRent.findByIdAndDelete(req.params.id);
     if (!result) {
       return next(new AppError('Home rent not found', 404));

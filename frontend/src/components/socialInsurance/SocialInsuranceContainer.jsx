@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SocialInsuranceTable from './SocialInsuranceTable';
 import SocialInsuranceForm from './SocialInsuranceForm';
 import FormDialog from '../common/FormDialog';
@@ -17,6 +17,13 @@ const SocialInsuranceContainer = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const { data: items, addItem, updateItem, deleteItem, loading, error, refreshData, pagination } = useDataManagement('socialInsurance');
+
+  // Dispatch count update when items change
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('itemCountUpdate', {
+      detail: { type: 'socialInsurance', count: items.length }
+    }));
+  }, [items]);
 
   const filteredItems = items.filter((item) => {
     // Search filter

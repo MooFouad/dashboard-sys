@@ -1,4 +1,5 @@
 import api from './api';
+import localStorageService from './localStorageService';
 
 const homeRentService = {
   // Get all home rents
@@ -28,7 +29,8 @@ const homeRentService = {
 
   // Get count
   getCount: async () => {
-    return await api.get('/home-rents/count/total');
+    const items = localStorageService.findAll('homeRents');
+    return { count: items ? items.length : 0 };
   },
 
   // Search home rents

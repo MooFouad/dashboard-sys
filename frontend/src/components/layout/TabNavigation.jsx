@@ -26,12 +26,12 @@ const TabNavigation = ({
   const tabClasses = (tab) =>
     `flex items-center gap-2 px-4 sm:px-6 py-3 font-medium transition duration-200 rounded-t-lg ${
       activeTab === tab
-        ? 'bg-white text-blue-600 shadow-sm border-t-2 border-blue-600'
-        : 'text-gray-600 hover:text-blue-600 hover:bg-white/60'
+        ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm border-t-2 border-blue-600 dark:border-blue-400'
+        : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white/60 dark:hover:bg-gray-700/60'
     }`;
 
   return (
-    <div className="border-b overflow-x-auto bg-gray-50 sticky top-0 z-10 shadow-sm">
+    <div className="border-b dark:border-gray-700 overflow-x-auto bg-gray-50 dark:bg-gray-900 sticky top-0 z-10 shadow-sm">
       <div className="w-full px-2">
         <div className="flex items-center justify-between">
           <div className="flex overflow-x-auto gap-1 flex-1">
@@ -103,14 +103,14 @@ const TabNavigation = ({
           <div className="flex gap-1 ml-2">
             <button
               onClick={onDiagnosticsClick}
-              className="p-2 hover:bg-gray-200 rounded-lg transition flex-shrink-0"
+              className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition flex-shrink-0 text-gray-700 dark:text-gray-300"
               title="Diagnostics"
             >
               <Info size={18} />
             </button>
             <button
               onClick={onSettingsClick}
-              className="p-2 hover:bg-gray-200 rounded-lg transition flex-shrink-0"
+              className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition flex-shrink-0 text-gray-700 dark:text-gray-300"
               title="Settings"
             >
               <Settings size={18} />

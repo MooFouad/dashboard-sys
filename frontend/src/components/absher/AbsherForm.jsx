@@ -39,7 +39,7 @@ const AbsherForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="Reference Number *" required>
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.referenceNumber}
             onChange={(e) => handleChange('referenceNumber', e.target.value)}
             required
@@ -50,7 +50,7 @@ const AbsherForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="Name *" required>
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.name}
             onChange={(e) => handleChange('name', e.target.value)}
             required
@@ -61,7 +61,7 @@ const AbsherForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="Plate Number">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.plateNumber}
             onChange={(e) => handleChange('plateNumber', e.target.value)}
           />
@@ -71,7 +71,7 @@ const AbsherForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="Vehicle Type">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.vehicleType}
             onChange={(e) => handleChange('vehicleType', e.target.value)}
           />
@@ -81,7 +81,7 @@ const AbsherForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="Owner Name">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.ownerName}
             onChange={(e) => handleChange('ownerName', e.target.value)}
           />
@@ -91,7 +91,7 @@ const AbsherForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="Owner ID">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.ownerId}
             onChange={(e) => handleChange('ownerId', e.target.value)}
           />
@@ -101,7 +101,7 @@ const AbsherForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="Issue Date">
           <input
             type="date"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.issueDate}
             onChange={(e) => handleChange('issueDate', e.target.value)}
           />
@@ -111,7 +111,7 @@ const AbsherForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="Registration Expiry Date *" required>
           <input
             type="date"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.expiryDate}
             onChange={(e) => handleChange('expiryDate', e.target.value)}
             required
@@ -122,7 +122,7 @@ const AbsherForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="Inspection Expiry Date">
           <input
             type="date"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.inspectionExpiryDate}
             onChange={(e) => handleChange('inspectionExpiryDate', e.target.value)}
           />
@@ -132,7 +132,7 @@ const AbsherForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="License Expiry Date">
           <input
             type="date"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.licenseExpiryDate}
             onChange={(e) => handleChange('licenseExpiryDate', e.target.value)}
           />
@@ -142,7 +142,7 @@ const AbsherForm = ({ onSubmit, onCancel, initialData = null }) => {
       {/* Notes - Full Width */}
       <FormField label="Notes">
         <textarea
-          className="w-full border rounded px-3 py-2"
+          className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
           value={formData.notes}
           onChange={(e) => handleChange('notes', e.target.value)}
           rows="3"

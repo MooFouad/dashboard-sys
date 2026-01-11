@@ -1,0 +1,690 @@
+[
+  {
+    "_id": "gosi-001",
+    "nin": "1023456789",
+    "name": "Ahmed Al-Rashid",
+    "nameAr": "أحمد الراشد",
+    "contributorType": "Saudi",
+    "establishmentRegNumber": "700123456",
+    "establishmentName": "Green Tech Solutions",
+    "engagementStartDate": "2022-03-15",
+    "engagementEndDate": null,
+    "engagementStatus": "Active",
+    "occupation": "Operations Manager",
+    "occupationCode": "1219",
+    "wage": 8500,
+    "currency": "SAR",
+    "totalEmployerContribution": 20,
+    "totalEmployeeContribution": 11,
+    "totalContribution": 21,
+    "products": [
+      {
+        "productName": "Occupational Hazards",
+        "productNameAr": "الأخطار المهنية",
+        "employerContribution": 2,
+        "employeeContribution": 0,
+        "totalContribution": 2
+      },
+      {
+        "productName": "Annuities",
+        "productNameAr": "المعاشات",
+        "employerContribution": 8,
+        "employeeContribution": 9,
+        "totalContribution": 17
+      },
+      {
+        "productName": "Unemployment SANED",
+        "productNameAr": "ساند",
+        "employerContribution": 0,
+        "employeeContribution": 2,
+        "totalContribution": 2
+      }
+    ],
+    "lastSyncDate": "2024-12-15"
+  },
+  {
+    "_id": "gosi-002",
+    "nin": "1034567890",
+    "name": "Mohammed Al-Fahad",
+    "nameAr": "محمد الفهد",
+    "contributorType": "Saudi",
+    "establishmentRegNumber": "700123456",
+    "establishmentName": "Green Tech Solutions",
+    "engagementStartDate": "2021-06-01",
+    "engagementEndDate": null,
+    "engagementStatus": "Active",
+    "occupation": "Financial Analyst",
+    "occupationCode": "2412",
+    "wage": 12000,
+    "currency": "SAR",
+    "totalEmployerContribution": 20,
+    "totalEmployeeContribution": 2,
+    "totalContribution": 21,
+    "products": [
+      {
+        "productName": "Occupational Hazards",
+        "productNameAr": "الأخطار المهنية",
+        "employerContribution": 2,
+        "employeeContribution": 0,
+        "totalContribution": 2
+      },
+      {
+        "productName": "Annuities",
+        "productNameAr": "المعاشات",
+        "employerContribution": 8,
+        "employeeContribution": 9,
+        "totalContribution": 17
+      },
+      {
+        "productName": "Unemployment SANED",
+        "productNameAr": "ساند",
+        "employerContribution": 0,
+        "employeeContribution": 2,
+        "totalContribution": 2
+      }
+    ],
+    "lastSyncDate": "2024-12-15"
+  },
+  {
+    "_id": "gosi-003",
+    "nin": "1045678901",
+    "name": "Khalid Al-Mutairi",
+    "nameAr": "خالد المطيري",
+    "contributorType": "Saudi",
+    "establishmentRegNumber": "700123456",
+    "establishmentName": "Green Tech Solutions",
+    "engagementStartDate": "2020-09-10",
+    "engagementEndDate": null,
+    "engagementStatus": "Active",
+    "occupation": "Administrative Officer",
+    "occupationCode": "3343",
+    "wage": 7000,
+    "currency": "SAR",
+    "totalEmployerContribution": 2,
+    "totalEmployeeContribution": 18,
+    "totalContribution": 21,
+    "products": [
+      {
+        "productName": "Occupational Hazards",
+        "productNameAr": "الأخطار المهنية",
+        "employerContribution": 2,
+        "employeeContribution": 0,
+        "totalContribution": 2
+      },
+      {
+        "productName": "Annuities",
+        "productNameAr": "المعاشات",
+        "employerContribution": 8,
+        "employeeContribution": 9,
+        "totalContribution": 17
+      },
+      {
+        "productName": "Unemployment SANED",
+        "productNameAr": "ساند",
+        "employerContribution": 0,
+        "employeeContribution": 2,
+        "totalContribution": 2
+      }
+    ],
+    "lastSyncDate": "2024-12-15"
+  },
+  {
+    "_id": "gosi-004",
+    "nin": "1056789012",
+    "name": "Fahad Al-Otaibi",
+    "nameAr": "فهد العتيبي",
+    "contributorType": "Saudi",
+    "establishmentRegNumber": "700123456",
+    "establishmentName": "Green Tech Solutions",
+    "engagementStartDate": "2023-01-20",
+    "engagementEndDate": null,
+    "engagementStatus": "Active",
+    "occupation": "Logistics Coordinator",
+    "occupationCode": "4321",
+    "wage": 9500,
+    "currency": "SAR",
+    "totalEmployerContribution": 4,
+    "totalEmployeeContribution": 12,
+    "totalContribution": 21,
+    "products": [
+      {
+        "productName": "Occupational Hazards",
+        "productNameAr": "الأخطار المهنية",
+        "employerContribution": 2,
+        "employeeContribution": 0,
+        "totalContribution": 2
+      },
+      {
+        "productName": "Annuities",
+        "productNameAr": "المعاشات",
+        "employerContribution": 8,
+        "employeeContribution": 9,
+        "totalContribution": 17
+      },
+      {
+        "productName": "Unemployment SANED",
+        "productNameAr": "ساند",
+        "employerContribution": 0,
+        "employeeContribution": 2,
+        "totalContribution": 2
+      }
+    ],
+    "lastSyncDate": "2024-12-15"
+  },
+  {
+    "_id": "gosi-005",
+    "nin": "1067890123",
+    "name": "Sultan Al-Qahtani",
+    "nameAr": "سلطان القحطاني",
+    "contributorType": "Saudi",
+    "establishmentRegNumber": "700123456",
+    "establishmentName": "Green Tech Solutions",
+    "engagementStartDate": "2022-07-12",
+    "engagementEndDate": null,
+    "engagementStatus": "Active",
+    "occupation": "Maintenance Technician",
+    "occupationCode": "7233",
+    "wage": 6500,
+    "currency": "SAR",
+    "totalEmployerContribution": 2,
+    "totalEmployeeContribution": 15,
+    "totalContribution": 21,
+    "products": [
+      {
+        "productName": "Occupational Hazards",
+        "productNameAr": "الأخطار المهنية",
+        "employerContribution": 2,
+        "employeeContribution": 0,
+        "totalContribution": 2
+      },
+      {
+        "productName": "Annuities",
+        "productNameAr": "المعاشات",
+        "employerContribution": 8,
+        "employeeContribution": 9,
+        "totalContribution": 17
+      },
+      {
+        "productName": "Unemployment SANED",
+        "productNameAr": "ساند",
+        "employerContribution": 0,
+        "employeeContribution": 2,
+        "totalContribution": 2
+      }
+    ],
+    "lastSyncDate": "2024-12-15"
+  },
+  {
+    "_id": "gosi-006",
+    "nin": "1078901234",
+    "name": "Yousef Al-Harbi",
+    "nameAr": "يوسف الحربي",
+    "contributorType": "Saudi",
+    "establishmentRegNumber": "700123456",
+    "establishmentName": "Green Tech Solutions",
+    "engagementStartDate": "2021-11-05",
+    "engagementEndDate": null,
+    "engagementStatus": "Active",
+    "occupation": "Warehouse Supervisor",
+    "occupationCode": "4321",
+    "wage": 8000,
+    "currency": "SAR",
+    "totalEmployerContribution": 10,
+    "totalEmployeeContribution": 11,
+    "totalContribution": 21,
+    "products": [
+      {
+        "productName": "Occupational Hazards",
+        "productNameAr": "الأخطار المهنية",
+        "employerContribution": 2,
+        "employeeContribution": 0,
+        "totalContribution": 2
+      },
+      {
+        "productName": "Annuities",
+        "productNameAr": "المعاشات",
+        "employerContribution": 8,
+        "employeeContribution": 9,
+        "totalContribution": 17
+      },
+      {
+        "productName": "Unemployment SANED",
+        "productNameAr": "ساند",
+        "employerContribution": 0,
+        "employeeContribution": 2,
+        "totalContribution": 2
+      }
+    ],
+    "lastSyncDate": "2024-12-15"
+  },
+  {
+    "_id": "gosi-007",
+    "nin": "1089012345",
+    "name": "Saad Al-Shammari",
+    "nameAr": "سعد الشمري",
+    "contributorType": "Saudi",
+    "establishmentRegNumber": "700123456",
+    "establishmentName": "Green Tech Solutions",
+    "engagementStartDate": "2023-04-18",
+    "engagementEndDate": null,
+    "engagementStatus": "Active",
+    "occupation": "Accountant",
+    "occupationCode": "2411",
+    "wage": 11000,
+    "currency": "SAR",
+    "totalEmployerContribution": 14,
+    "totalEmployeeContribution": 2,
+    "totalContribution": 21,
+    "products": [
+      {
+        "productName": "Occupational Hazards",
+        "productNameAr": "الأخطار المهنية",
+        "employerContribution": 2,
+        "employeeContribution": 0,
+        "totalContribution": 2
+      },
+      {
+        "productName": "Annuities",
+        "productNameAr": "المعاشات",
+        "employerContribution": 8,
+        "employeeContribution": 9,
+        "totalContribution": 17
+      },
+      {
+        "productName": "Unemployment SANED",
+        "productNameAr": "ساند",
+        "employerContribution": 0,
+        "employeeContribution": 2,
+        "totalContribution": 2
+      }
+    ],
+    "lastSyncDate": "2024-12-15"
+  },
+  {
+    "_id": "gosi-008",
+    "nin": "1090123456",
+    "name": "Bandar Al-Dosari",
+    "nameAr": "بندر الدوسري",
+    "contributorType": "Saudi",
+    "establishmentRegNumber": "700123456",
+    "establishmentName": "Green Tech Solutions",
+    "engagementStartDate": "2022-12-01",
+    "engagementEndDate": null,
+    "engagementStatus": "Active",
+    "occupation": "HR Specialist",
+    "occupationCode": "2423",
+    "wage": 7500,
+    "currency": "SAR",
+    "totalEmployerContribution": 6,
+    "totalEmployeeContribution": 21,
+    "totalContribution": 21,
+    "products": [
+      {
+        "productName": "Occupational Hazards",
+        "productNameAr": "الأخطار المهنية",
+        "employerContribution": 2,
+        "employeeContribution": 0,
+        "totalContribution": 2
+      },
+      {
+        "productName": "Annuities",
+        "productNameAr": "المعاشات",
+        "employerContribution": 8,
+        "employeeContribution": 9,
+        "totalContribution": 17
+      },
+      {
+        "productName": "Unemployment SANED",
+        "productNameAr": "ساند",
+        "employerContribution": 0,
+        "employeeContribution": 2,
+        "totalContribution": 2
+      }
+    ],
+    "lastSyncDate": "2024-12-15"
+  },
+  {
+    "_id": "gosi-009",
+    "nin": "1101234567",
+    "name": "Ibrahim Al-Khaldi",
+    "nameAr": "إبراهيم الخالدي",
+    "contributorType": "Saudi",
+    "establishmentRegNumber": "700123456",
+    "establishmentName": "Green Tech Solutions",
+    "engagementStartDate": "2023-05-20",
+    "engagementEndDate": null,
+    "engagementStatus": "Active",
+    "occupation": "Fleet Supervisor",
+    "occupationCode": "3321",
+    "wage": 9200,
+    "currency": "SAR",
+    "totalEmployerContribution": 10,
+    "totalEmployeeContribution": 11,
+    "totalContribution": 21,
+    "products": [
+      {
+        "productName": "Occupational Hazards",
+        "productNameAr": "الأخطار المهنية",
+        "employerContribution": 2,
+        "employeeContribution": 0,
+        "totalContribution": 2
+      },
+      {
+        "productName": "Annuities",
+        "productNameAr": "المعاشات",
+        "employerContribution": 8,
+        "employeeContribution": 9,
+        "totalContribution": 17
+      },
+      {
+        "productName": "Unemployment SANED",
+        "productNameAr": "ساند",
+        "employerContribution": 0,
+        "employeeContribution": 2,
+        "totalContribution": 2
+      }
+    ],
+    "lastSyncDate": "2024-12-15"
+  },
+  {
+    "_id": "gosi-010",
+    "nin": "1112345678",
+    "name": "Nasser Al-Anazi",
+    "nameAr": "ناصر العنزي",
+    "contributorType": "Saudi",
+    "establishmentRegNumber": "700123456",
+    "establishmentName": "Green Tech Solutions",
+    "engagementStartDate": "2021-09-10",
+    "engagementEndDate": null,
+    "engagementStatus": "Active",
+    "occupation": "Regional Manager",
+    "occupationCode": "1221",
+    "wage": 13500,
+    "currency": "SAR",
+    "totalEmployerContribution": 14,
+    "totalEmployeeContribution": 7,
+    "totalContribution": 21,
+    "products": [
+      {
+        "productName": "Occupational Hazards",
+        "productNameAr": "الأخطار المهنية",
+        "employerContribution": 2,
+        "employeeContribution": 0,
+        "totalContribution": 2
+      },
+      {
+        "productName": "Annuities",
+        "productNameAr": "المعاشات",
+        "employerContribution": 8,
+        "employeeContribution": 9,
+        "totalContribution": 17
+      },
+      {
+        "productName": "Unemployment SANED",
+        "productNameAr": "ساند",
+        "employerContribution": 0,
+        "employeeContribution": 2,
+        "totalContribution": 2
+      }
+    ],
+    "lastSyncDate": "2024-12-15"
+  },
+  {
+    "_id": "gosi-011",
+    "nin": "1123456789",
+    "name": "Abdulaziz Al-Salem",
+    "nameAr": "عبدالعزيز السالم",
+    "contributorType": "Saudi",
+    "establishmentRegNumber": "700123456",
+    "establishmentName": "Green Tech Solutions",
+    "engagementStartDate": "2019-01-18",
+    "engagementEndDate": null,
+    "engagementStatus": "Active",
+    "occupation": "Warehouse Clerk",
+    "occupationCode": "4321",
+    "wage": 6200,
+    "currency": "SAR",
+    "totalEmployerContribution": 2,
+    "totalEmployeeContribution": 19,
+    "totalContribution": 21,
+    "products": [
+      {
+        "productName": "Occupational Hazards",
+        "productNameAr": "الأخطار المهنية",
+        "employerContribution": 2,
+        "employeeContribution": 0,
+        "totalContribution": 2
+      },
+      {
+        "productName": "Annuities",
+        "productNameAr": "المعاشات",
+        "employerContribution": 8,
+        "employeeContribution": 9,
+        "totalContribution": 17
+      },
+      {
+        "productName": "Unemployment SANED",
+        "productNameAr": "ساند",
+        "employerContribution": 0,
+        "employeeContribution": 2,
+        "totalContribution": 2
+      }
+    ],
+    "lastSyncDate": "2024-12-15"
+  },
+  {
+    "_id": "gosi-012",
+    "nin": "1134567890",
+    "name": "Faisal Al-Mutlaq",
+    "nameAr": "فيصل المطلق",
+    "contributorType": "Saudi",
+    "establishmentRegNumber": "700123456",
+    "establishmentName": "Green Tech Solutions",
+    "engagementStartDate": "2022-06-14",
+    "engagementEndDate": null,
+    "engagementStatus": "Active",
+    "occupation": "Senior Accountant",
+    "occupationCode": "2411",
+    "wage": 10500,
+    "currency": "SAR",
+    "totalEmployerContribution": 12,
+    "totalEmployeeContribution": 9,
+    "totalContribution": 21,
+    "products": [
+      {
+        "productName": "Occupational Hazards",
+        "productNameAr": "الأخطار المهنية",
+        "employerContribution": 2,
+        "employeeContribution": 0,
+        "totalContribution": 2
+      },
+      {
+        "productName": "Annuities",
+        "productNameAr": "المعاشات",
+        "employerContribution": 8,
+        "employeeContribution": 9,
+        "totalContribution": 17
+      },
+      {
+        "productName": "Unemployment SANED",
+        "productNameAr": "ساند",
+        "employerContribution": 0,
+        "employeeContribution": 2,
+        "totalContribution": 2
+      }
+    ],
+    "lastSyncDate": "2024-12-15"
+  },
+  {
+    "_id": "gosi-013",
+    "nin": "1145678901",
+    "name": "Omar Al-Zahrani",
+    "nameAr": "عمر الزهراني",
+    "contributorType": "Saudi",
+    "establishmentRegNumber": "700123456",
+    "establishmentName": "Green Tech Solutions",
+    "engagementStartDate": "2020-02-28",
+    "engagementEndDate": null,
+    "engagementStatus": "Active",
+    "occupation": "Senior Technician",
+    "occupationCode": "7233",
+    "wage": 7800,
+    "currency": "SAR",
+    "totalEmployerContribution": 8,
+    "totalEmployeeContribution": 13,
+    "totalContribution": 21,
+    "products": [
+      {
+        "productName": "Occupational Hazards",
+        "productNameAr": "الأخطار المهنية",
+        "employerContribution": 2,
+        "employeeContribution": 0,
+        "totalContribution": 2
+      },
+      {
+        "productName": "Annuities",
+        "productNameAr": "المعاشات",
+        "employerContribution": 8,
+        "employeeContribution": 9,
+        "totalContribution": 17
+      },
+      {
+        "productName": "Unemployment SANED",
+        "productNameAr": "ساند",
+        "employerContribution": 0,
+        "employeeContribution": 2,
+        "totalContribution": 2
+      }
+    ],
+    "lastSyncDate": "2024-12-15"
+  },
+  {
+    "_id": "gosi-014",
+    "nin": "1156789012",
+    "name": "Majed Al-Harthy",
+    "nameAr": "ماجد الحارثي",
+    "contributorType": "Saudi",
+    "establishmentRegNumber": "700123456",
+    "establishmentName": "Green Tech Solutions",
+    "engagementStartDate": "2018-11-05",
+    "engagementEndDate": null,
+    "engagementStatus": "Active",
+    "occupation": "Driver",
+    "occupationCode": "8322",
+    "wage": 5800,
+    "currency": "SAR",
+    "totalEmployerContribution": 2,
+    "totalEmployeeContribution": 19,
+    "totalContribution": 21,
+    "products": [
+      {
+        "productName": "Occupational Hazards",
+        "productNameAr": "الأخطار المهنية",
+        "employerContribution": 2,
+        "employeeContribution": 0,
+        "totalContribution": 2
+      },
+      {
+        "productName": "Annuities",
+        "productNameAr": "المعاشات",
+        "employerContribution": 8,
+        "employeeContribution": 9,
+        "totalContribution": 17
+      },
+      {
+        "productName": "Unemployment SANED",
+        "productNameAr": "ساند",
+        "employerContribution": 0,
+        "employeeContribution": 2,
+        "totalContribution": 2
+      }
+    ],
+    "lastSyncDate": "2024-12-15"
+  },
+  {
+    "_id": "gosi-015",
+    "nin": "1167890123",
+    "name": "Rakan Al-Ghamdi",
+    "nameAr": "راكان الغامدي",
+    "contributorType": "Saudi",
+    "establishmentRegNumber": "700123456",
+    "establishmentName": "Green Tech Solutions",
+    "engagementStartDate": "2023-08-19",
+    "engagementEndDate": null,
+    "engagementStatus": "Active",
+    "occupation": "Fleet Coordinator",
+    "occupationCode": "3321",
+    "wage": 8800,
+    "currency": "SAR",
+    "totalEmployerContribution": 10,
+    "totalEmployeeContribution": 11,
+    "totalContribution": 21,
+    "products": [
+      {
+        "productName": "Occupational Hazards",
+        "productNameAr": "الأخطار المهنية",
+        "employerContribution": 2,
+        "employeeContribution": 0,
+        "totalContribution": 2
+      },
+      {
+        "productName": "Annuities",
+        "productNameAr": "المعاشات",
+        "employerContribution": 8,
+        "employeeContribution": 9,
+        "totalContribution": 17
+      },
+      {
+        "productName": "Unemployment SANED",
+        "productNameAr": "ساند",
+        "employerContribution": 0,
+        "employeeContribution": 2,
+        "totalContribution": 2
+      }
+    ],
+    "lastSyncDate": "2024-12-15"
+  },
+  {
+    "_id": "gosi-016",
+    "nin": "1178901234",
+    "name": "Waleed Al-Juhani",
+    "nameAr": "وليد الجهني",
+    "contributorType": "Saudi",
+    "establishmentRegNumber": "700123456",
+    "establishmentName": "Green Tech Solutions",
+    "engagementStartDate": "2021-12-03",
+    "engagementEndDate": null,
+    "engagementStatus": "Active",
+    "occupation": "Office Administrator",
+    "occupationCode": "3343",
+    "wage": 8200,
+    "currency": "SAR",
+    "totalEmployerContribution": 8,
+    "totalEmployeeContribution": 13,
+    "totalContribution": 21,
+    "products": [
+      {
+        "productName": "Occupational Hazards",
+        "productNameAr": "الأخطار المهنية",
+        "employerContribution": 2,
+        "employeeContribution": 0,
+        "totalContribution": 2
+      },
+      {
+        "productName": "Annuities",
+        "productNameAr": "المعاشات",
+        "employerContribution": 8,
+        "employeeContribution": 9,
+        "totalContribution": 17
+      },
+      {
+        "productName": "Unemployment SANED",
+        "productNameAr": "ساند",
+        "employerContribution": 0,
+        "employeeContribution": 2,
+        "totalContribution": 2
+      }
+    ],
+    "lastSyncDate": "2024-12-15"
+  }
+]

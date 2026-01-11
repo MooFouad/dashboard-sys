@@ -2,7 +2,7 @@ import React from 'react';
 
 const StatusLegend = () => {
 return (
-<div className="p-4 bg-yellow-50 border-b flex gap-4 items-center text-sm">
+<div className="p-4 bg-yellow-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex gap-4 items-center text-sm text-gray-800 dark:text-gray-200 transition-colors duration-200">
       <div className="flex items-center gap-2">
       <div className="w-4 h-4 bg-red-500 border-2 border-red-500 rounded"></div>
       <span>Expired</span>
@@ -12,7 +12,7 @@ return (
       <span>Warning - 10 days or less</span>
       </div>
       <div className="flex items-center gap-2">
-      <div className="w-4 h-4 bg-white border-2 border-gray-300 rounded"></div>
+      <div className="w-4 h-4 bg-white dark:bg-gray-300 border-2 border-gray-300 dark:border-gray-500 rounded"></div>
       <span>Valid</span>
       </div>
 </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HomeRentsTable from './HomeRentsTable';
 import HomeRentForm from './HomeRentForm';
 import FormDialog from '../common/FormDialog';
@@ -17,6 +17,13 @@ const HomeRentsContainer = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const { data: items, addItem, updateItem, deleteItem, loading, error, refreshData, pagination } = useDataManagement('homeRent');
+
+  // Dispatch count update when items change
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('itemCountUpdate', {
+      detail: { type: 'homeRents', count: items.length }
+    }));
+  }, [items]);
 
   const filteredItems = items.filter((item) => {
     // Search filter

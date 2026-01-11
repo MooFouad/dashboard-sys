@@ -5,8 +5,25 @@ import { useTheme } from '../../contexts/ThemeContext';
 
 const Header = ({ sidebarCollapsed, sidebarOpen, onToggleSidebar }) => {
   const { user } = useAuth();
-  const { theme, toggleTheme, isDark } = useTheme();
+  const { themeMode, toggleTheme, isDark } = useTheme();
   const isGuest = user?.isGuest;
+
+  const getThemeIcon = () => {
+    if (themeMode === 'auto') {
+      return isDark ? <Moon size={20} /> : <Sun size={20} />;
+    }
+    return isDark ? <Sun size={20} /> : <Moon size={20} />;
+  };
+
+  const getThemeTitle = () => {
+    if (themeMode === 'auto') {
+      return `Auto mode (currently ${isDark ? 'dark' : 'light'}) - Click for light mode`;
+    }
+    if (themeMode === 'light') {
+      return 'Light mode - Click for dark mode';
+    }
+    return 'Dark mode - Click for auto mode';
+  };
 
   return (
     <div className="bg-white dark:bg-gray-900 shadow-lg transition-colors duration-200">
@@ -23,16 +40,16 @@ const Header = ({ sidebarCollapsed, sidebarOpen, onToggleSidebar }) => {
                 GTS Management System
               </h1>
               {/* Demo Mode Badge */}
-              <span className="hidden lg:inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs font-semibold rounded-full border border-blue-200 dark:border-blue-700">
+              {/* <span className="hidden lg:inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs font-semibold rounded-full border border-blue-200 dark:border-blue-700">
                 <Info size={12} />
                 Portfolio Demo
-              </span>
+              </span> */}
               {/* Guest User Badge */}
-              {isGuest && (
+              {/* {isGuest && (
                 <span className="hidden lg:inline-flex items-center px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs font-semibold rounded-full border border-green-200 dark:border-green-700">
                   Guest Mode
                 </span>
-              )}
+              )} */}
             </div>
           </div>
 
@@ -41,11 +58,14 @@ const Header = ({ sidebarCollapsed, sidebarOpen, onToggleSidebar }) => {
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
-              className="hidden md:flex items-center justify-center p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
-              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              className="hidden md:flex items-center justify-center gap-1 p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+              title={getThemeTitle()}
               aria-label="Toggle theme"
             >
-              {isDark ? <Sun size={20} /> : <Moon size={20} />}
+              {getThemeIcon()}
+              {themeMode === 'auto' && (
+                <span className="text-xs font-medium">Auto</span>
+              )}
             </button>
 
             {/* Mobile Menu Button */}

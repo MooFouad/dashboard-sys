@@ -78,7 +78,7 @@ const AttachmentField = ({ attachments = [], onChange, preview = false }) => {
     <div className="space-y-2">
       {!preview && (
         <div className="flex items-center gap-2">
-          <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded cursor-pointer hover:bg-gray-50">
+          <label className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 transition-colors duration-200">
             <Paperclip size={16} />
             <span>Add Attachments</span>
             <input
@@ -93,20 +93,20 @@ const AttachmentField = ({ attachments = [], onChange, preview = false }) => {
       )}
 
       {attachments?.length > 0 && (
-        <div className="border rounded-lg overflow-hidden">
-          <div className="bg-gray-50 px-4 py-2 border-b">
-            <h3 className="text-sm font-medium text-gray-700">
+        <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+          <div className="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Attachments ({attachments.length})
             </h3>
           </div>
-          <div className="divide-y">
+          <div className="divide-y divide-gray-200 dark:divide-gray-700">
             {attachments.map((file, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-white">
+              <div key={index} className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 transition-colors duration-200">
                 <div className="flex items-center space-x-3">
-                  <Paperclip size={16} className="text-gray-400" />
+                  <Paperclip size={16} className="text-gray-400 dark:text-gray-500" />
                   <div>
-                    <p className="text-sm font-medium text-gray-700">{file.name}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{file.name}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       {(file.size / 1024).toFixed(2)} KB
                     </p>
                   </div>
@@ -115,7 +115,7 @@ const AttachmentField = ({ attachments = [], onChange, preview = false }) => {
                   <button
                     type="button"
                     onClick={() => handlePreview(file.url)}
-                    className="p-1 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
+                    className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                   >
                     <Eye size={16} />
                   </button>
@@ -123,7 +123,7 @@ const AttachmentField = ({ attachments = [], onChange, preview = false }) => {
                     <button
                       type="button"
                       onClick={() => handleRemove(index)}
-                      className="p-1 text-red-500 hover:text-red-700 rounded-full hover:bg-red-50"
+                      className="p-1 text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
                     >
                       <X size={16} />
                     </button>

@@ -1,4 +1,5 @@
 import api from './api';
+import localStorageService from './localStorageService';
 
 /**
  * GOSI Service
@@ -28,7 +29,8 @@ export const getById = async (id) => {
  * @returns {Promise<Object>} - Count
  */
 export const getCount = async () => {
-  return await api.get('/gosi/count/total');
+  const items = localStorageService.findAll('gosi');
+  return { count: items ? items.length : 0 };
 };
 
 /**

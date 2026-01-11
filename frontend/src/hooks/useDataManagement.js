@@ -33,6 +33,45 @@ export const useDataManagement = (type, options = {}) => {
     }
   };
 
+  // Calculate remainingDays and status for records that don't have them
+  const enrichData = (items, dataType) => {
+    if (dataType !== 'socialInsurance') return items;
+
+    return items.map(item => {
+      // If already has remainingDays and status, return as is
+      if (item.remainingDays !== undefined && item.remainingDays !== null && item.status) {
+        return item;
+      }
+
+      // Calculate missing fields
+      let remainingDays = null;
+      let status = null;
+
+      if (item.endDate) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const endDate = new Date(item.endDate);
+        endDate.setHours(0, 0, 0, 0);
+
+        remainingDays = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+
+        if (remainingDays < 0) {
+          status = 'expired';
+        } else if (remainingDays <= 30) {
+          status = 'expiring-soon';
+        } else {
+          status = 'active';
+        }
+      }
+
+      return {
+        ...item,
+        remainingDays,
+        status: status || item.status
+      };
+    });
+  };
+
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
@@ -58,13 +97,15 @@ export const useDataManagement = (type, options = {}) => {
 
       // Handle paginated response format: { success: true, data: [...], pagination: {...} }
       if (response?.pagination) {
-        setData(Array.isArray(response.data) ? response.data : []);
+        const enrichedData = enrichData(Array.isArray(response.data) ? response.data : [], type);
+        setData(enrichedData);
         setTotalItems(response.pagination.total);
         setTotalPages(response.pagination.pages);
       } else {
         // Handle non-paginated response format: { success: true, data: [...] }
         const items = response?.data || response;
-        setData(Array.isArray(items) ? items : []);
+        const enrichedData = enrichData(Array.isArray(items) ? items : [], type);
+        setData(enrichedData);
         setTotalItems(Array.isArray(items) ? items.length : 0);
         setTotalPages(1);
       }

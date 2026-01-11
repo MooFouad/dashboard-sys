@@ -41,21 +41,21 @@ const GOSITable = ({ data, onDelete }) => {
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case 'active':
-        return 'bg-green-100 text-green-800 border-green-300';
+        return 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300 border-green-300 dark:border-green-700';
       case 'inactive':
-        return 'bg-gray-100 text-gray-800 border-gray-300';
+        return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300 border-gray-300 dark:border-gray-600';
       case 'terminated':
-        return 'bg-red-100 text-red-800 border-red-300';
+        return 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300 border-red-300 dark:border-red-700';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-300';
+        return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300 border-gray-300 dark:border-gray-600';
     }
   };
 
   if (data.length === 0) {
     return (
-      <div className="text-center py-12 bg-white rounded-lg border">
-        <p className="text-gray-500 mb-2">No GOSI records found</p>
-        <p className="text-sm text-gray-400">Import an Excel file with employee Iqama numbers to fetch data from GOSI</p>
+      <div className="text-center py-12 bg-white dark:bg-gray-900 rounded-lg border dark:border-gray-700">
+        <p className="text-gray-500 dark:text-gray-400 mb-2">No GOSI records found</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500">Import an Excel file with employee Iqama numbers to fetch data from GOSI</p>
       </div>
     );
   }
@@ -68,7 +68,7 @@ const GOSITable = ({ data, onDelete }) => {
         return (
           <div
             key={item._id}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all"
+            className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-all"
           >
             <div className="p-4">
               {/* Desktop Layout - Hidden on mobile */}
@@ -79,13 +79,13 @@ const GOSITable = ({ data, onDelete }) => {
                     <User size={20} className="text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-base text-gray-900 truncate">
+                    <h3 className="font-semibold text-base text-gray-900 dark:text-gray-100 truncate">
                       {item.name || item.nin}
                     </h3>
                     {item.nameAr && (
-                      <p className="text-xs text-gray-600" dir="rtl">{item.nameAr}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400" dir="rtl">{item.nameAr}</p>
                     )}
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                       NIN: {item.nin}
                     </p>
                   </div>
@@ -94,51 +94,51 @@ const GOSITable = ({ data, onDelete }) => {
                 {/* Center - Engagement Dates */}
                 <div className="flex items-center gap-6">
                   <div className="text-center">
-                    <div className="flex items-center gap-1 text-xs text-gray-500 mb-0.5">
+                    <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mb-0.5">
                       <Calendar size={12} />
                       <span>Start</span>
                     </div>
-                    <div className="font-semibold text-sm text-gray-900">
+                    <div className="font-semibold text-sm text-gray-900 dark:text-gray-100">
                       {formatDate(item.engagementStartDate)}
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="flex items-center gap-1 text-xs text-gray-500 mb-0.5">
+                    <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mb-0.5">
                       <Calendar size={12} />
                       <span>End</span>
                     </div>
-                    <div className="font-semibold text-sm text-gray-900">
+                    <div className="font-semibold text-sm text-gray-900 dark:text-gray-100">
                       {item.engagementEndDate ? (
                         formatDate(item.engagementEndDate)
                       ) : (
-                        <span className="text-green-600 text-xs">Ongoing</span>
+                        <span className="text-green-600 dark:text-green-400 text-xs">Ongoing</span>
                       )}
                     </div>
                   </div>
                 </div>
 
                 {/* Right Side - Deduction Rates */}
-                <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-3 min-w-[180px]">
-                  <div className="flex items-center gap-1 text-xs text-gray-600 mb-1.5">
+                <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-lg p-3 min-w-[180px]">
+                  <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300 mb-1.5">
                     <TrendingUp size={12} />
                     <span className="font-medium">Deduction</span>
                   </div>
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs">
-                      <span className="text-gray-600">Employer:</span>
-                      <span className="font-bold text-green-600">
+                      <span className="text-gray-600 dark:text-gray-400">Employer:</span>
+                      <span className="font-bold text-green-600 dark:text-green-400">
                         {item.totalEmployerContribution ? `${item.totalEmployerContribution}%` : '-'}
                       </span>
                     </div>
                     <div className="flex justify-between text-xs">
-                      <span className="text-gray-600">Employee:</span>
-                      <span className="font-bold text-blue-600">
+                      <span className="text-gray-600 dark:text-gray-400">Employee:</span>
+                      <span className="font-bold text-blue-600 dark:text-blue-400">
                         {item.totalEmployeeContribution ? `${item.totalEmployeeContribution}%` : '-'}
                       </span>
                     </div>
-                    <div className="flex justify-between text-xs pt-1 border-t border-gray-300">
-                      <span className="text-gray-700 font-medium">Total:</span>
-                      <span className="font-bold text-gray-900 text-sm">
+                    <div className="flex justify-between text-xs pt-1 border-t border-gray-300 dark:border-gray-600">
+                      <span className="text-gray-700 dark:text-gray-300 font-medium">Total:</span>
+                      <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">
                         {item.totalContribution ? `${item.totalContribution}%` : '-'}
                       </span>
                     </div>
@@ -152,12 +152,12 @@ const GOSITable = ({ data, onDelete }) => {
                   </span>
                   <button
                     onClick={() => onDelete(item._id)}
-                    className="p-1.5 hover:bg-red-50 rounded-lg transition-colors text-red-500 hover:text-red-700 group"
+                    className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 group"
                     title="Delete record"
                   >
                     <Trash2 size={18} className="group-hover:scale-110 transition-transform" />
                   </button>
-                  <div className="text-xs text-gray-400">
+                  <div className="text-xs text-gray-400 dark:text-gray-500">
                     {formatDate(item.lastSyncDate)}
                   </div>
                 </div>
@@ -172,11 +172,11 @@ const GOSITable = ({ data, onDelete }) => {
                       <User size={16} className="text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-sm text-gray-900 break-words">
+                      <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100 break-words">
                         {item.name || item.nin}
                       </h3>
                       {item.nameAr && (
-                        <p className="text-xs text-gray-600 break-words" dir="rtl">{item.nameAr}</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 break-words" dir="rtl">{item.nameAr}</p>
                       )}
                     </div>
                   </div>
@@ -186,7 +186,7 @@ const GOSITable = ({ data, onDelete }) => {
                     </span>
                     <button
                       onClick={() => onDelete(item._id)}
-                      className="p-1 hover:bg-red-50 rounded transition-colors text-red-500"
+                      className="p-1 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors text-red-500 dark:text-red-400"
                       title="Delete"
                     >
                       <Trash2 size={16} />
@@ -195,58 +195,58 @@ const GOSITable = ({ data, onDelete }) => {
                 </div>
 
                 {/* NIN */}
-                <div className="text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded">
+                <div className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
                   <span className="font-medium">NIN:</span> {item.nin}
                 </div>
 
                 {/* Dates */}
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-blue-50 rounded-lg p-2">
-                    <div className="flex items-center gap-1 text-xs text-blue-600 mb-1">
+                  <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-2">
+                    <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 mb-1">
                       <Calendar size={10} />
                       <span className="font-medium">Start</span>
                     </div>
-                    <div className="text-xs font-semibold text-gray-900">
+                    <div className="text-xs font-semibold text-gray-900 dark:text-gray-100">
                       {formatDate(item.engagementStartDate)}
                     </div>
                   </div>
-                  <div className="bg-green-50 rounded-lg p-2">
-                    <div className="flex items-center gap-1 text-xs text-green-600 mb-1">
+                  <div className="bg-green-50 dark:bg-green-900/30 rounded-lg p-2">
+                    <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400 mb-1">
                       <Calendar size={10} />
                       <span className="font-medium">End</span>
                     </div>
-                    <div className="text-xs font-semibold text-gray-900">
+                    <div className="text-xs font-semibold text-gray-900 dark:text-gray-100">
                       {item.engagementEndDate ? (
                         formatDate(item.engagementEndDate)
                       ) : (
-                        <span className="text-green-600">Ongoing</span>
+                        <span className="text-green-600 dark:text-green-400">Ongoing</span>
                       )}
                     </div>
                   </div>
                 </div>
 
                 {/* Deduction Rates */}
-                <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-3">
-                  <div className="flex items-center gap-1 text-xs text-gray-700 mb-2 font-medium">
+                <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-lg p-3">
+                  <div className="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300 mb-2 font-medium">
                     <TrendingUp size={12} />
                     <span>Deduction Rates</span>
                   </div>
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-center text-xs">
-                      <span className="text-gray-600">Employer:</span>
-                      <span className="font-bold text-green-600">
+                      <span className="text-gray-600 dark:text-gray-400">Employer:</span>
+                      <span className="font-bold text-green-600 dark:text-green-400">
                         {item.totalEmployerContribution ? `${item.totalEmployerContribution}%` : '-'}
                       </span>
                     </div>
                     <div className="flex justify-between items-center text-xs">
-                      <span className="text-gray-600">Employee:</span>
-                      <span className="font-bold text-blue-600">
+                      <span className="text-gray-600 dark:text-gray-400">Employee:</span>
+                      <span className="font-bold text-blue-600 dark:text-blue-400">
                         {item.totalEmployeeContribution ? `${item.totalEmployeeContribution}%` : '-'}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center text-xs pt-1.5 border-t border-gray-300">
-                      <span className="text-gray-700 font-semibold">Total:</span>
-                      <span className="font-bold text-gray-900">
+                    <div className="flex justify-between items-center text-xs pt-1.5 border-t border-gray-300 dark:border-gray-600">
+                      <span className="text-gray-700 dark:text-gray-300 font-semibold">Total:</span>
+                      <span className="font-bold text-gray-900 dark:text-gray-100">
                         {item.totalContribution ? `${item.totalContribution}%` : '-'}
                       </span>
                     </div>
@@ -255,7 +255,7 @@ const GOSITable = ({ data, onDelete }) => {
 
                 {/* Last Sync */}
                 {item.lastSyncDate && (
-                  <div className="text-[10px] text-gray-400 text-right">
+                  <div className="text-[10px] text-gray-400 dark:text-gray-500 text-right">
                     Last sync: {formatDate(item.lastSyncDate)}
                   </div>
                 )}

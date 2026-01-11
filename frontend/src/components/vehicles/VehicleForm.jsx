@@ -44,7 +44,7 @@ const VehicleForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="1. Plate Number">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.plateNumber}
             onChange={(e) => handleChange('plateNumber', e.target.value)}
           />
@@ -54,7 +54,7 @@ const VehicleForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="2. Registration Type">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.registrationType}
             onChange={(e) => handleChange('registrationType', e.target.value)}
           />
@@ -64,7 +64,7 @@ const VehicleForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="3. Brand">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.vehicleMaker}
             onChange={(e) => handleChange('vehicleMaker', e.target.value)}
           />
@@ -74,7 +74,7 @@ const VehicleForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="4. Model">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.vehicleModel}
             onChange={(e) => handleChange('vehicleModel', e.target.value)}
           />
@@ -84,7 +84,7 @@ const VehicleForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="5. Year of Manufacture">
           <input
             type="number"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.modelYear}
             onChange={(e) => handleChange('modelYear', e.target.value)}
           />
@@ -94,7 +94,7 @@ const VehicleForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="6. Serial Number">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.sequenceNumber}
             onChange={(e) => handleChange('sequenceNumber', e.target.value)}
           />
@@ -104,7 +104,7 @@ const VehicleForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="7. Chassis Number">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.chassisNumber}
             onChange={(e) => handleChange('chassisNumber', e.target.value)}
           />
@@ -114,7 +114,7 @@ const VehicleForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="8. Basic Color">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.basicColor}
             onChange={(e) => handleChange('basicColor', e.target.value)}
           />
@@ -124,7 +124,7 @@ const VehicleForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="9. License Expiry Date" highlight>
           <input
             type="date"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.licenseExpiryDate}
             onChange={(e) => handleChange('licenseExpiryDate', e.target.value)}
           />
@@ -134,7 +134,7 @@ const VehicleForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="10. Inspection Expiry Date" highlight>
           <input
             type="date"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.inspectionExpiryDate}
             onChange={(e) => handleChange('inspectionExpiryDate', e.target.value)}
           />
@@ -144,7 +144,7 @@ const VehicleForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="11. Actual User ID Number">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.actualDriverId}
             onChange={(e) => handleChange('actualDriverId', e.target.value)}
           />
@@ -154,7 +154,7 @@ const VehicleForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="12. Actual User Name">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.actualDriverName}
             onChange={(e) => handleChange('actualDriverName', e.target.value)}
           />
@@ -164,7 +164,7 @@ const VehicleForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="13. Inspection Status">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.inspectionStatus}
             onChange={(e) => handleChange('inspectionStatus', e.target.value)}
           />
@@ -174,7 +174,7 @@ const VehicleForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="14. Insurance Status">
           <input
             type="text"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
             value={formData.insuranceStatus}
             onChange={(e) => handleChange('insuranceStatus', e.target.value)}
           />

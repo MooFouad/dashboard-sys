@@ -1,4 +1,5 @@
 import api from './api';
+import localStorageService from './localStorageService';
 
 const absherService = {
   // Get all absher records
@@ -28,7 +29,8 @@ const absherService = {
 
   // Get count
   getCount: async () => {
-    return await api.get('/absher/count/total');
+    const items = localStorageService.findAll('absher');
+    return { count: items ? items.length : 0 };
   },
 
   // Search absher records

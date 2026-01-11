@@ -9,8 +9,7 @@ const insuranceSchema = new mongoose.Schema({
   plateNumber: {
     type: String,
     required: true,
-    trim: true,
-    index: true
+    trim: true
   },
 
   // Sequence Number (رقم التسلسل)

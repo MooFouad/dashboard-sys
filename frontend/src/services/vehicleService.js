@@ -1,4 +1,5 @@
 import api from './api';
+import localStorageService from './localStorageService';
 
 const vehicleService = {
   // Get all vehicles
@@ -28,7 +29,8 @@ const vehicleService = {
 
   // Get count
   getCount: async () => {
-    return await api.get('/vehicles/count/total');
+    const items = localStorageService.findAll('vehicles');
+    return { count: items ? items.length : 0 };
   },
 
   // Search vehicles

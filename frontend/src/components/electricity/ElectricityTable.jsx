@@ -6,19 +6,19 @@ import ScrollableTableWrapper from '../common/ScrollableTableWrapper';
 const ElectricityTable = ({ data, onEdit, onDelete }) => {
   return (
     <ScrollableTableWrapper className="-mx-2 sm:mx-0">
-      <table className="min-w-full">
-      <thead className="bg-gray-100 border-b">
+      <table className="min-w-full bg-white dark:bg-gray-900">
+      <thead className="bg-gray-100 dark:bg-gray-800 border-b dark:border-gray-700">
         <tr>
-          <th className="px-4 py-3 text-left text-sm font-semibold">No.</th>
-          <th className="px-4 py-3 text-left text-sm font-semibold">Account</th>
-          <th className="px-4 py-3 text-left text-sm font-semibold">Name</th>
-          <th className="px-4 py-3 text-left text-sm font-semibold">City</th>
-          <th className="px-4 py-3 text-left text-sm font-semibold">Address</th>
-          <th className="px-4 py-3 text-left text-sm font-semibold">Project</th>
-          <th className="px-4 py-3 text-left text-sm font-semibold">Division</th>
-          <th className="px-4 py-3 text-left text-sm font-semibold">Meter Number</th>
-          <th className="px-4 py-3 text-left text-sm font-semibold">Date</th>
-          <th className="px-4 py-3 text-left text-sm font-semibold">Actions</th>
+          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">No.</th>
+          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Account</th>
+          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Name</th>
+          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">City</th>
+          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Address</th>
+          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Project</th>
+          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Division</th>
+          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Meter Number</th>
+          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Date</th>
+          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -26,16 +26,16 @@ const ElectricityTable = ({ data, onEdit, onDelete }) => {
           const rowClass = getRowColorClass(electricity, 'electricity');
 
           return (
-            <tr key={electricity._id} className={`border-b ${rowClass} hover:bg-gray-50 transition`}>
-              <td className="px-4 py-3 text-sm whitespace-nowrap">{electricity.no}</td>
-              <td className="px-4 py-3 text-sm whitespace-nowrap">{electricity.account}</td>
-              <td className="px-4 py-3 text-sm">{electricity.name}</td>
-              <td className="px-4 py-3 text-sm whitespace-nowrap">{electricity.city}</td>
-              <td className="px-4 py-3 text-sm">{electricity.address}</td>
-              <td className="px-4 py-3 text-sm">{electricity.project}</td>
-              <td className="px-4 py-3 text-sm">{electricity.division}</td>
-              <td className="px-4 py-3 text-sm whitespace-nowrap">{electricity.meterNumber}</td>
-              <td className="px-4 py-3 text-sm whitespace-nowrap">{electricity.date}</td>
+            <tr key={electricity._id} className={`border-b dark:border-gray-700 ${rowClass} hover:bg-gray-50 dark:hover:bg-gray-800 transition`}>
+              <td className="px-4 py-3 text-sm whitespace-nowrap text-gray-900 dark:text-gray-100">{electricity.no}</td>
+              <td className="px-4 py-3 text-sm whitespace-nowrap text-gray-900 dark:text-gray-100">{electricity.account}</td>
+              <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{electricity.name}</td>
+              <td className="px-4 py-3 text-sm whitespace-nowrap text-gray-900 dark:text-gray-100">{electricity.city}</td>
+              <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{electricity.address}</td>
+              <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{electricity.project}</td>
+              <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{electricity.division}</td>
+              <td className="px-4 py-3 text-sm whitespace-nowrap text-gray-900 dark:text-gray-100">{electricity.meterNumber}</td>
+              <td className="px-4 py-3 text-sm whitespace-nowrap text-gray-900 dark:text-gray-100">{electricity.date}</td>
               <td className="px-4 py-3 text-sm whitespace-nowrap">
                 <ActionButtons
                   onEdit={() => onEdit(electricity)}
