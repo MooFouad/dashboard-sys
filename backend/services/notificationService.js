@@ -6,6 +6,11 @@ const HomeRent = require('../models/HomeRent');
 const Electricity = require('../models/Electricity');
 const GOSI = require('../models/GOSI');
 
+// Use mock services in demo mode
+const useMockData = process.env.USE_MOCK_DATA === 'true';
+const mockPushSubscriptionService = useMockData ? require('./mockPushSubscriptionService') : null;
+const mockDataService = useMockData ? require('./mockDataService') : null;
+
 // Configure VAPID
 webpush.setVapidDetails(
   process.env.VAPID_EMAIL,
@@ -108,7 +113,12 @@ class NotificationService {
 
     try {
       // Check Vehicles
-      const vehicles = await Vehicle.find({});
+      const vehicles = useMockData
+        ? await mockDataService.find('vehicles')
+        : await Vehicle.find({});
+
+      console.log(`📋 Checking ${vehicles.length} vehicle(s) for expiring items...`);
+
       for (const vehicle of vehicles) {
         const licenseDays = this.getDaysUntilExpiration(vehicle.licenseExpiryDate);
         const inspectionDays = this.getDaysUntilExpiration(vehicle.inspectionExpiryDate);
@@ -179,7 +189,12 @@ class NotificationService {
       }
 
       // Check Home Rents - Only check contract ending date
-      const homeRents = await HomeRent.find({});
+      const homeRents = useMockData
+        ? await mockDataService.find('homeRents')
+        : await HomeRent.find({});
+
+      console.log(`📋 Checking ${homeRents.length} home rent(s) for expiring contracts...`);
+
       for (const rent of homeRents) {
         const contractDays = this.getDaysUntilExpiration(rent.contractEndingDate);
 
@@ -206,7 +221,15 @@ class NotificationService {
       }
 
       // Check Electricity Bills (only unpaid bills)
-      const bills = await Electricity.find({ paymentStatus: { $ne: 'Paid' } });
+      const allBills = useMockData
+        ? await mockDataService.find('electricity')
+        : await Electricity.find({});
+
+      // Filter unpaid bills
+      const bills = allBills.filter(bill => bill.paymentStatus !== 'Paid');
+
+      console.log(`📋 Checking ${bills.length} unpaid electricity bill(s) for due dates...`);
+
       for (const bill of bills) {
         const dueDays = this.getDaysUntilExpiration(bill.dueDate);
 
@@ -232,7 +255,12 @@ class NotificationService {
       }
 
       // Check GOSI Engagement End Dates
-      const gosiEmployees = await GOSI.find({});
+      const gosiEmployees = useMockData
+        ? await mockDataService.find('gosi')
+        : await GOSI.find({});
+
+      console.log(`📋 Checking ${gosiEmployees.length} GOSI employee(s) for engagement end dates...`);
+
       for (const employee of gosiEmployees) {
         const endDays = this.getDaysUntilExpiration(employee.engagementEndDate);
 
@@ -257,9 +285,22 @@ class NotificationService {
         }
       }
 
+      console.log(`\n✅ Notification check complete: Found ${notifications.length} item(s) needing notification`);
+      if (notifications.length > 0) {
+        console.log('📊 Summary by type:');
+        const summary = notifications.reduce((acc, n) => {
+          acc[n.type] = (acc[n.type] || 0) + 1;
+          return acc;
+        }, {});
+        Object.entries(summary).forEach(([type, count]) => {
+          console.log(`   - ${type}: ${count} item(s)`);
+        });
+      }
+
       return notifications;
     } catch (error) {
-      console.error('Error getting items needing notification:', error);
+      console.error('❌ Error getting items needing notification:', error);
+      console.error('Error stack:', error.stack);
       return [];
     }
   }
@@ -267,7 +308,8 @@ class NotificationService {
   // Send push notification to all subscribers (filtered by notificationTypes)
   async sendPushNotification(notification) {
     try {
-      const allSubscriptions = await PushSubscription.find({});
+      const SubscriptionService = useMockData ? mockPushSubscriptionService : PushSubscription;
+      const allSubscriptions = await SubscriptionService.find({});
       console.log(`📤 Found ${allSubscriptions.length} total push subscription(s)`);
 
       // Filter subscriptions based on notification type
@@ -323,7 +365,8 @@ class NotificationService {
 
             // If subscription is invalid, delete it
             if (error.statusCode === 410 || error.statusCode === 404) {
-              await PushSubscription.deleteOne({ _id: sub._id });
+              const SubscriptionService = useMockData ? mockPushSubscriptionService : PushSubscription;
+              await SubscriptionService.deleteOne({ _id: sub._id });
               console.log(`  🗑️ Removed invalid subscription for ${sub.userEmail}`);
             }
             throw error;
@@ -560,7 +603,8 @@ class NotificationService {
     }
 
     // ========== EMAIL NOTIFICATIONS (Uses same PushSubscription data, filtered by type) ==========
-    const pushSubscriptions = await PushSubscription.find({});
+    const SubscriptionService = useMockData ? mockPushSubscriptionService : PushSubscription;
+    const pushSubscriptions = await SubscriptionService.find({});
 
     if (pushSubscriptions.length > 0) {
       console.log(`\n📧 Processing Email Notifications...`);
@@ -789,7 +833,7 @@ class NotificationService {
     const testNotification = {
       title: '🧪 Test Push Notification',
       message: 'This is a test Windows push notification from GTS Dashboard',
-      type: 'test',
+      type: 'vehicle', // Use 'vehicle' type so it matches user subscriptions
       subType: 'test',
       daysUntil: 10
     };

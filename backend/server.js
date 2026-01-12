@@ -45,6 +45,7 @@ const connectDB = async () => {
   if (process.env.USE_MOCK_DATA === 'true') {
     console.log('📦 DEMO MODE: Using mock JSON data (no database connection)');
     console.log('   Data loaded from: backend/data/mock/*.json');
+    console.log('   Push subscriptions stored in-memory (lost on server restart)');
 
     // Load mock data service
     const mockDataService = require('./services/mockDataService');
@@ -61,6 +62,12 @@ const connectDB = async () => {
   }
 
   // Normal MongoDB connection for production
+  if (!process.env.MONGODB_URI) {
+    console.error('❌ MONGODB_URI not found in environment variables');
+    console.log('💡 Set MONGODB_URI in .env file or set USE_MOCK_DATA=true for demo mode');
+    process.exit(1);
+  }
+
   const maxRetries = 3;
   let retries = 0;
 

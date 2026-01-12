@@ -25,6 +25,85 @@ class MockDataService {
   }
 
   /**
+   * Generate dynamic expiration dates for demo
+   * Returns dates within the next 2-10 days
+   */
+  generateDynamicDate(daysFromNow) {
+    const date = new Date();
+    date.setDate(date.getDate() + daysFromNow);
+    return date.toISOString().split('T')[0]; // Return YYYY-MM-DD format
+  }
+
+  /**
+   * Update mock data with dynamic expiration dates
+   * Ensures at least 2 items per category expire in the next 10 days
+   */
+  addDynamicExpirationDates() {
+    console.log('🔄 Adding dynamic expiration dates to mock data...');
+
+    // Vehicles: Update first 2 items with expiring dates
+    if (this.data.vehicles.length >= 2) {
+      this.data.vehicles[0].licenseExpiryDate = this.generateDynamicDate(3);
+      this.data.vehicles[0].inspectionExpiryDate = this.generateDynamicDate(5);
+      this.data.vehicles[1].insuranceExpiryDate = this.generateDynamicDate(7);
+      this.data.vehicles[1].licenseExpiryDate = this.generateDynamicDate(9);
+      console.log('   ✅ Vehicles: Set 2 items to expire in 3-9 days');
+    }
+
+    // Home Rents: Update first 2 items
+    if (this.data.homeRents.length >= 2) {
+      this.data.homeRents[0].contractEndingDate = this.generateDynamicDate(4);
+      this.data.homeRents[1].contractEndingDate = this.generateDynamicDate(8);
+      console.log('   ✅ Home Rents: Set 2 contracts to expire in 4-8 days');
+    }
+
+    // Electricity: Update first 2 unpaid bills
+    if (this.data.electricity.length >= 2) {
+      let unpaidCount = 0;
+      for (let i = 0; i < this.data.electricity.length && unpaidCount < 2; i++) {
+        if (this.data.electricity[i].paymentStatus !== 'Paid') {
+          this.data.electricity[i].dueDate = this.generateDynamicDate(2 + unpaidCount * 4);
+          this.data.electricity[i].paymentStatus = 'Unpaid';
+          unpaidCount++;
+        }
+      }
+      // If we didn't find 2 unpaid bills, make some unpaid
+      if (unpaidCount < 2) {
+        this.data.electricity[0].dueDate = this.generateDynamicDate(2);
+        this.data.electricity[0].paymentStatus = 'Unpaid';
+        this.data.electricity[1].dueDate = this.generateDynamicDate(6);
+        this.data.electricity[1].paymentStatus = 'Unpaid';
+      }
+      console.log('   ✅ Electricity: Set 2 bills due in 2-6 days');
+    }
+
+    // Absher: Update first 2 items (same as vehicles - license/inspection/insurance)
+    if (this.data.absher.length >= 2) {
+      this.data.absher[0].licenseExpiryDate = this.generateDynamicDate(3);
+      this.data.absher[0].inspectionExpiryDate = this.generateDynamicDate(5);
+      this.data.absher[1].insuranceExpiryDate = this.generateDynamicDate(7);
+      this.data.absher[1].licenseExpiryDate = this.generateDynamicDate(9);
+      console.log('   ✅ Absher/Tamm: Set 2 items to expire in 3-9 days');
+    }
+
+    // Social Insurance: Update first 2 items (uses endDate field)
+    if (this.data.socialInsurance.length >= 2) {
+      this.data.socialInsurance[0].endDate = this.generateDynamicDate(4);
+      this.data.socialInsurance[1].endDate = this.generateDynamicDate(7);
+      console.log('   ✅ Social Insurance: Set 2 items to expire in 4-7 days');
+    }
+
+    // GOSI: Update first 2 items with engagement end dates
+    if (this.data.gosi.length >= 2) {
+      this.data.gosi[0].engagementEndDate = this.generateDynamicDate(5);
+      this.data.gosi[1].engagementEndDate = this.generateDynamicDate(8);
+      console.log('   ✅ GOSI: Set 2 engagements to end in 5-8 days');
+    }
+
+    console.log('✅ Dynamic expiration dates applied successfully');
+  }
+
+  /**
    * Load all mock data from JSON files
    */
   async loadData() {
@@ -58,6 +137,9 @@ class MockDataService {
           user.password = await bcrypt.hash(user.password, 10);
         }
       }
+
+      // Add dynamic expiration dates for demo mode
+      this.addDynamicExpirationDates();
 
       this.loaded = true;
       console.log('✅ Mock data loaded successfully');
@@ -194,11 +276,12 @@ class MockDataService {
   }
 
   /**
-   * Reset data to original state (reload from files)
+   * Reset data to original state (reload from files with new dynamic dates)
    */
   async reset() {
     this.loaded = false;
     await this.loadData();
+    console.log('🔄 Mock data reset with fresh dynamic expiration dates');
   }
 
   /**

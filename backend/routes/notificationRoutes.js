@@ -4,6 +4,19 @@ const PushSubscription = require('../models/PushSubscription');
 const notificationService = require('../services/notificationService');
 const { authenticate } = require('../middleware/auth');
 
+// Use mock push subscription service in demo mode
+const useMockData = process.env.USE_MOCK_DATA === 'true';
+const mockPushSubscriptionService = useMockData ? require('../services/mockPushSubscriptionService') : null;
+
+// Helper to get the correct subscription service
+const getSubscriptionService = () => {
+  if (useMockData) {
+    console.log('📦 [DEMO] Using in-memory push subscription storage');
+    return mockPushSubscriptionService;
+  }
+  return PushSubscription;
+};
+
 // ========== CRON JOB ENDPOINT ==========
 // This endpoint can be called by UptimeRobot or cron-job.org daily at 9 AM
 // For Render: Use UptimeRobot to keep service alive and trigger notifications
@@ -67,47 +80,91 @@ router.post('/subscribe', async (req, res) => {
     }
 
     // Check if subscription already exists
-    const existing = await PushSubscription.findOne({ endpoint: subscription.endpoint });
+    const SubscriptionService = getSubscriptionService();
+    const existing = useMockData
+      ? await SubscriptionService.findOne({ endpoint: subscription.endpoint })
+      : await SubscriptionService.findOne({ endpoint: subscription.endpoint });
 
     if (existing) {
       console.log('Updating existing subscription for:', email);
-      existing.userEmail = email;
-      existing.lastUsed = new Date();
-      existing.keys = subscription.keys;
-      // Update notificationTypes if provided, otherwise keep existing or use default
-      if (notificationTypes) {
-        existing.notificationTypes = notificationTypes;
+      if (useMockData) {
+        // Update in mock service
+        const updatedSub = {
+          ...existing,
+          userEmail: email,
+          lastUsed: new Date(),
+          keys: subscription.keys,
+          notificationTypes: notificationTypes || existing.notificationTypes
+        };
+        // Remove old and add updated
+        await SubscriptionService.deleteOne({ endpoint: subscription.endpoint });
+        await SubscriptionService.create(updatedSub);
+        return res.json({
+          success: true,
+          message: 'Subscription updated',
+          id: updatedSub._id,
+          notificationTypes: updatedSub.notificationTypes
+        });
+      } else {
+        // Update in MongoDB
+        existing.userEmail = email;
+        existing.lastUsed = new Date();
+        existing.keys = subscription.keys;
+        if (notificationTypes) {
+          existing.notificationTypes = notificationTypes;
+        }
+        await existing.save();
+        return res.json({
+          success: true,
+          message: 'Subscription updated',
+          id: existing._id,
+          notificationTypes: existing.notificationTypes
+        });
       }
-      await existing.save();
-      return res.json({
-        success: true,
-        message: 'Subscription updated',
-        id: existing._id,
-        notificationTypes: existing.notificationTypes
-      });
     }
 
     // Create new subscription
-    const newSubscription = new PushSubscription({
-      endpoint: subscription.endpoint,
-      keys: subscription.keys,
-      userEmail: email,
-      notificationTypes: notificationTypes || ['vehicle', 'homeRent', 'electricity', 'absher', 'socialInsurance', 'gosi'],
-      userAgent: req.headers['user-agent']
-    });
+    if (useMockData) {
+      const newSubscription = await SubscriptionService.create({
+        endpoint: subscription.endpoint,
+        keys: subscription.keys,
+        userEmail: email,
+        notificationTypes: notificationTypes || ['vehicle', 'homeRent', 'electricity', 'absher', 'socialInsurance', 'gosi'],
+        userAgent: req.headers['user-agent']
+      });
 
-    await newSubscription.save();
+      console.log('✅ New push subscription saved for:', email);
+      console.log('Subscription ID:', newSubscription._id);
+      console.log('Notification types:', newSubscription.notificationTypes);
 
-    console.log('✅ New push subscription saved for:', email);
-    console.log('Subscription ID:', newSubscription._id);
-    console.log('Notification types:', newSubscription.notificationTypes);
+      res.json({
+        success: true,
+        message: 'Subscribed to notifications',
+        id: newSubscription._id,
+        notificationTypes: newSubscription.notificationTypes
+      });
+    } else {
+      const newSubscription = new PushSubscription({
+        endpoint: subscription.endpoint,
+        keys: subscription.keys,
+        userEmail: email,
+        notificationTypes: notificationTypes || ['vehicle', 'homeRent', 'electricity', 'absher', 'socialInsurance', 'gosi'],
+        userAgent: req.headers['user-agent']
+      });
 
-    res.json({
-      success: true,
-      message: 'Subscribed to notifications',
-      id: newSubscription._id,
-      notificationTypes: newSubscription.notificationTypes
-    });
+      await newSubscription.save();
+
+      console.log('✅ New push subscription saved for:', email);
+      console.log('Subscription ID:', newSubscription._id);
+      console.log('Notification types:', newSubscription.notificationTypes);
+
+      res.json({
+        success: true,
+        message: 'Subscribed to notifications',
+        id: newSubscription._id,
+        notificationTypes: newSubscription.notificationTypes
+      });
+    }
   } catch (error) {
     console.error('❌ Error saving subscription:', error);
     res.status(500).json({
@@ -126,11 +183,14 @@ router.post('/unsubscribe', async (req, res) => {
       return res.status(400).json({ error: 'Endpoint is required' });
     }
 
-    const result = await PushSubscription.deleteOne({ endpoint });
+    const SubscriptionService = getSubscriptionService();
+    const result = useMockData
+      ? await SubscriptionService.deleteOne({ endpoint })
+      : await SubscriptionService.deleteOne({ endpoint });
 
     console.log('✅ Subscription removed:', endpoint);
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: 'Unsubscribed successfully',
       deletedCount: result.deletedCount
     });
@@ -227,10 +287,16 @@ router.post('/update-preferences', authenticate, async (req, res) => {
     }
 
     // Update all subscriptions for this email
-    const result = await PushSubscription.updateMany(
-      { userEmail: email },
-      { $set: { notificationTypes: notificationTypes } }
-    );
+    const SubscriptionService = getSubscriptionService();
+    const result = useMockData
+      ? await SubscriptionService.updateMany(
+          { userEmail: email },
+          { $set: { notificationTypes: notificationTypes } }
+        )
+      : await SubscriptionService.updateMany(
+          { userEmail: email },
+          { $set: { notificationTypes: notificationTypes } }
+        );
 
     console.log('✅ Preferences updated for:', email);
     console.log('Updated subscriptions:', result.modifiedCount);
@@ -252,7 +318,10 @@ router.get('/preferences/:email', authenticate, async (req, res) => {
   try {
     const { email } = req.params;
 
-    const subscription = await PushSubscription.findOne({ userEmail: email });
+    const SubscriptionService = getSubscriptionService();
+    const subscription = useMockData
+      ? await SubscriptionService.findOne({ userEmail: email })
+      : await SubscriptionService.findOne({ userEmail: email });
 
     if (!subscription) {
       return res.json({
@@ -274,10 +343,20 @@ router.get('/preferences/:email', authenticate, async (req, res) => {
 // Get all subscriptions (for debugging)
 router.get('/subscriptions', authenticate, async (req, res) => {
   try {
-    const subscriptions = await PushSubscription.find({}).select('-keys').maxTimeMS(5000).exec();
+    const SubscriptionService = getSubscriptionService();
+    const subscriptions = useMockData
+      ? await SubscriptionService.find({})
+      : await SubscriptionService.find({}).select('-keys').maxTimeMS(5000).exec();
+
+    // Remove keys from response for security
+    const sanitized = subscriptions.map(sub => {
+      const { keys, ...rest } = sub;
+      return rest;
+    });
+
     res.json({
-      count: subscriptions.length,
-      subscriptions
+      count: sanitized.length,
+      subscriptions: sanitized
     });
   } catch (error) {
     console.error('Error fetching subscriptions:', error);

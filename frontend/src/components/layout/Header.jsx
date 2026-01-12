@@ -1,9 +1,9 @@
 import React from 'react';
-import { Menu, X, Info, Moon, Sun } from 'lucide-react';
+import { Menu, X, Info, Moon, Sun, Bell } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
-const Header = ({ sidebarCollapsed, sidebarOpen, onToggleSidebar }) => {
+const Header = ({ sidebarCollapsed, sidebarOpen, onToggleSidebar, onNotificationClick }) => {
   const { user } = useAuth();
   const { themeMode, toggleTheme, isDark } = useTheme();
   const isGuest = user?.isGuest;
@@ -55,6 +55,17 @@ const Header = ({ sidebarCollapsed, sidebarOpen, onToggleSidebar }) => {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
+            {/* Notification System Button - Desktop */}
+            <button
+              onClick={onNotificationClick}
+              className="hidden md:flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200 shadow-md"
+              title="Open Notification System"
+              aria-label="Notification System"
+            >
+              <Bell size={20} />
+              <span className="text-sm font-medium">Notification System</span>
+            </button>
+
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
@@ -68,10 +79,20 @@ const Header = ({ sidebarCollapsed, sidebarOpen, onToggleSidebar }) => {
               )}
             </button>
 
+            {/* Notification System Button - Mobile (before menu) */}
+            <button
+              onClick={onNotificationClick}
+              className="md:hidden p-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200 shadow-md"
+              title="Notification System"
+              aria-label="Notification System"
+            >
+              <Bell size={20} />
+            </button>
+
             {/* Mobile Menu Button */}
             <button
               onClick={onToggleSidebar}
-              className="md:hidden p-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition"
+              className="md:hidden p-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition"
               title={sidebarOpen ? "Close menu" : "Open menu"}
             >
               {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
