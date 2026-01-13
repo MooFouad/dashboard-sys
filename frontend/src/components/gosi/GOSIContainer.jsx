@@ -276,8 +276,8 @@ const GOSIContainer = () => {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
         <div>
-          <h2 className="text-xl font-semibold">GOSI (Social Insurance)</h2>
-          <p className="text-sm text-gray-600">Engagement Deduction API Data</p>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">GOSI (Social Insurance)</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Engagement Deduction API Data</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <input

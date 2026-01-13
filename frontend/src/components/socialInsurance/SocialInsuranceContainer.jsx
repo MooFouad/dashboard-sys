@@ -106,7 +106,7 @@ const SocialInsuranceContainer = () => {
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-        <h2 className="text-xl font-semibold">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
           Social Insurance
         </h2>
         <div className="flex flex-wrap gap-2">

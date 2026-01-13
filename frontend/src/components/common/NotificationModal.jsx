@@ -236,15 +236,12 @@ const NotificationModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+    /* Modal Container - Click outside to close */
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto"
+      onClick={onClose}
+    >
+        {/* Modal Content - Click inside won't close */}
         <div
           className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
@@ -432,8 +429,7 @@ const NotificationModal = ({ isOpen, onClose }) => {
             )}
           </div>
         </div>
-      </div>
-    </>
+    </div>
   );
 };
 

@@ -5,6 +5,7 @@ import StatusLegend from './components/common/StatusLegend';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import { vehicleService, homeRentService, electricityService, socialInsuranceService, absherService, gosiService } from './services';
 import pushNotificationService from './services/pushNotificationService';
+import { initializeDemoData } from './services/demoDataLoader';
 
 // Lazy load container components for code splitting
 const HomeRentsContainer = lazy(() => import('./components/homeRents/HomeRentsContainer'));
@@ -45,6 +46,9 @@ const App = () => {
   });
 
   useEffect(() => {
+    // Initialize demo data instantly (no backend required)
+    initializeDemoData();
+
     // Fetch initial counts from API
     const fetchCounts = async () => {
       try {
