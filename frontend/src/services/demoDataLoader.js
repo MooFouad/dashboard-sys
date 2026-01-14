@@ -4,6 +4,7 @@
  */
 
 const STORAGE_PREFIX = 'gts_dashboard_';
+const DEMO_DATA_VERSION = '2.0'; // Increment to force regeneration
 
 // Generate dynamic dates for demo data
 const generateDynamicDate = (daysFromNow) => {
@@ -12,17 +13,65 @@ const generateDynamicDate = (daysFromNow) => {
   return date.toISOString().split('T')[0];
 };
 
+// Calculate status based on remaining days (matches SocialInsuranceForm logic)
+const calculateStatus = (endDate) => {
+  if (!endDate) return null;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const end = new Date(endDate);
+  end.setHours(0, 0, 0, 0);
+
+  const diffTime = end - today;
+  const remainingDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (remainingDays < 0) return 'expired';
+  if (remainingDays <= 30) return 'expiring-soon';
+  return 'active';
+};
+
+// Calculate payment status based on due date
+const calculatePaymentStatus = (dueDate) => {
+  if (!dueDate) return 'Unpaid';
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const due = new Date(dueDate);
+  due.setHours(0, 0, 0, 0);
+
+  // If due date has passed, mark as Overdue
+  if (due < today) return 'Overdue';
+
+  // Otherwise, unpaid
+  return 'Unpaid';
+};
+
 // Demo data generator
 const generateDemoData = () => {
-  // Get existing data or generate new
-  const existingVehicles = localStorage.getItem(STORAGE_PREFIX + 'vehicles');
-  const existingHomeRents = localStorage.getItem(STORAGE_PREFIX + 'homeRents');
-  const existingElectricity = localStorage.getItem(STORAGE_PREFIX + 'electricity');
+  // Check version to force regeneration when data structure changes
+  const storedVersion = localStorage.getItem(STORAGE_PREFIX + 'version');
 
-  // Only generate if data doesn't exist
-  if (existingVehicles && existingHomeRents && existingElectricity) {
-    console.log('✅ Demo data already in localStorage, skipping generation');
-    return false;
+  if (storedVersion !== DEMO_DATA_VERSION) {
+    console.log('🔄 Demo data version mismatch, regenerating data...');
+    // Clear old data
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith(STORAGE_PREFIX)) {
+        localStorage.removeItem(key);
+      }
+    });
+  } else {
+    // Get existing data
+    const existingVehicles = localStorage.getItem(STORAGE_PREFIX + 'vehicles');
+    const existingHomeRents = localStorage.getItem(STORAGE_PREFIX + 'homeRents');
+    const existingElectricity = localStorage.getItem(STORAGE_PREFIX + 'electricity');
+
+    // Only generate if data doesn't exist
+    if (existingVehicles && existingHomeRents && existingElectricity) {
+      console.log('✅ Demo data already in localStorage, skipping generation');
+      return false;
+    }
   }
 
   console.log('📦 Generating demo data with dynamic expiration dates...');
@@ -75,15 +124,17 @@ const generateDemoData = () => {
     }
   ];
 
-  // Electricity demo data
+  // Electricity demo data with dynamic payment status
+  const elec1DueDate = generateDynamicDate(2);
+  const elec2DueDate = generateDynamicDate(6);
   const electricity = [
     {
       _id: 'elec-demo-1',
       accountNumber: 'SEC-12345',
       propertyAddress: '123 King Fahd Road, Riyadh',
       billAmount: 450,
-      dueDate: generateDynamicDate(2),
-      paymentStatus: 'Unpaid',
+      dueDate: elec1DueDate,
+      paymentStatus: calculatePaymentStatus(elec1DueDate),
       createdAt: new Date().toISOString()
     },
     {
@@ -91,8 +142,8 @@ const generateDemoData = () => {
       accountNumber: 'SEC-67890',
       propertyAddress: '456 Olaya Street, Riyadh',
       billAmount: 620,
-      dueDate: generateDynamicDate(6),
-      paymentStatus: 'Unpaid',
+      dueDate: elec2DueDate,
+      paymentStatus: calculatePaymentStatus(elec2DueDate),
       createdAt: new Date().toISOString()
     }
   ];
@@ -119,16 +170,18 @@ const generateDemoData = () => {
     }
   ];
 
-  // Social Insurance demo data
+  // Social Insurance demo data with dynamic status
+  const si1EndDate = generateDynamicDate(4);
+  const si2EndDate = generateDynamicDate(7);
   const socialInsurance = [
     {
       _id: 'si-demo-1',
       name: 'Khalid Al-Mutairi',
       nin: '1045678901',
       startDate: '2022-09-10',
-      endDate: generateDynamicDate(4),
+      endDate: si1EndDate,
       policyNumber: 'SI-2022-001',
-      status: 'active',
+      status: calculateStatus(si1EndDate),
       createdAt: new Date().toISOString()
     },
     {
@@ -136,9 +189,9 @@ const generateDemoData = () => {
       name: 'Fahad Al-Otaibi',
       nin: '1056789012',
       startDate: '2023-02-15',
-      endDate: generateDynamicDate(7),
+      endDate: si2EndDate,
       policyNumber: 'SI-2023-002',
-      status: 'active',
+      status: calculateStatus(si2EndDate),
       createdAt: new Date().toISOString()
     }
   ];
@@ -148,6 +201,7 @@ const generateDemoData = () => {
 
   // Save to localStorage
   try {
+    localStorage.setItem(STORAGE_PREFIX + 'version', DEMO_DATA_VERSION);
     localStorage.setItem(STORAGE_PREFIX + 'vehicles', JSON.stringify(vehicles));
     localStorage.setItem(STORAGE_PREFIX + 'homeRents', JSON.stringify(homeRents));
     localStorage.setItem(STORAGE_PREFIX + 'electricity', JSON.stringify(electricity));
@@ -191,7 +245,15 @@ export const initializeDemoData = () => {
   return false;
 };
 
+// Export helper functions for dynamic status calculation
+export {
+  calculateStatus,
+  calculatePaymentStatus
+};
+
 export default {
   initializeDemoData,
-  isDemoMode
+  isDemoMode,
+  calculateStatus,
+  calculatePaymentStatus
 };

@@ -35,112 +35,67 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAuth = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      // Verify token with backend
-      const response = await api.get('/auth/me');
-      // Backend returns { success: true, data: { user: {...} } }
-      const userData = response.data?.user || response.user;
-      setUser(userData);
-      setIsAuthenticated(true);
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      localStorage.removeItem('token');
-      setUser(null);
-      setIsAuthenticated(false);
-    } finally {
-      setLoading(false);
-    }
+    // Demo Mode: Instant login with no API calls
+    console.log('🎭 Demo Mode: Instant authentication');
+    setUser({
+      name: 'Demo User',
+      email: 'demo@gts-dashboard.com',
+      role: 'guest'
+    });
+    setIsAuthenticated(true);
+    setLoading(false);
   };
 
   const login = async (email, password) => {
-    try {
-      const response = await api.post('/auth/login', { email, password });
-      // Backend returns { success: true, data: { user: {...}, token: '...' } }
-      const userData = response.data?.user || response.user;
-      const authToken = response.data?.token || response.token;
+    // Demo Mode: Instant login
+    const demoUser = {
+      name: email.split('@')[0] || 'User',
+      email: email,
+      role: 'user'
+    };
 
-      if (!authToken) {
-        throw new Error('No token received from server');
-      }
+    localStorage.setItem('token', 'demo-token-' + Date.now());
+    setUser(demoUser);
+    setIsAuthenticated(true);
 
-      localStorage.setItem('token', authToken);
-      setUser(userData);
-      setIsAuthenticated(true);
-
-      return { success: true };
-    } catch (error) {
-      return {
-        success: false,
-        error: error.message || 'Login failed'
-      };
-    }
+    return { success: true };
   };
 
   const register = async (name, email, password) => {
-    try {
-      const response = await api.post('/auth/register', { name, email, password });
-      // Backend returns { success: true, data: { user: {...}, token: '...' } }
-      const userData = response.data?.user || response.user;
-      const authToken = response.data?.token || response.token;
+    // Demo Mode: Instant registration
+    const demoUser = {
+      name: name,
+      email: email,
+      role: 'user'
+    };
 
-      if (!authToken) {
-        throw new Error('No token received from server');
-      }
+    localStorage.setItem('token', 'demo-token-' + Date.now());
+    setUser(demoUser);
+    setIsAuthenticated(true);
 
-      localStorage.setItem('token', authToken);
-      setUser(userData);
-      setIsAuthenticated(true);
-
-      return { success: true };
-    } catch (error) {
-      return {
-        success: false,
-        error: error.message || 'Registration failed'
-      };
-    }
+    return { success: true };
   };
 
   const guestLogin = async () => {
-    try {
-      const response = await api.post('/auth/guest');
-      // Backend returns { success: true, data: { user: {...}, token: '...' } }
-      const userData = response.data?.user || response.user;
-      const authToken = response.data?.token || response.token;
+    // Demo Mode: Instant guest login
+    const guestUser = {
+      name: 'Guest User',
+      email: 'guest@gts-dashboard.com',
+      role: 'guest'
+    };
 
-      if (!authToken) {
-        throw new Error('No token received from server');
-      }
+    localStorage.setItem('token', 'demo-guest-token');
+    setUser(guestUser);
+    setIsAuthenticated(true);
 
-      localStorage.setItem('token', authToken);
-      setUser(userData);
-      setIsAuthenticated(true);
-
-      return { success: true };
-    } catch (error) {
-      return {
-        success: false,
-        error: error.message || 'Guest login failed'
-      };
-    }
+    return { success: true };
   };
 
   const logout = async () => {
-    try {
-      // Call backend logout endpoint (optional, for tracking)
-      await api.post('/auth/logout').catch(() => {
-        // Ignore errors, logout locally anyway
-      });
-    } finally {
-      localStorage.removeItem('token');
-      setUser(null);
-      setIsAuthenticated(false);
-    }
+    // Demo Mode: Instant logout
+    localStorage.removeItem('token');
+    setUser(null);
+    setIsAuthenticated(false);
   };
 
   const value = {

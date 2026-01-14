@@ -3,7 +3,7 @@ import Header from './components/layout/Header';
 import Sidebar from './components/layout/Sidebar';
 import StatusLegend from './components/common/StatusLegend';
 import LoadingSpinner from './components/common/LoadingSpinner';
-import { vehicleService, homeRentService, electricityService, socialInsuranceService, absherService, gosiService } from './services';
+// Services imported via initializeDemoData
 import pushNotificationService from './services/pushNotificationService';
 import { initializeDemoData } from './services/demoDataLoader';
 
@@ -32,7 +32,7 @@ const App = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showDiagnostics, setShowDiagnostics] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [showNotificationBanner, setShowNotificationBanner] = useState(false);
   const [counts, setCounts] = useState({
     vehicles: 0,
@@ -40,52 +40,36 @@ const App = () => {
     electricity: 0,
     absher: 0,
     socialInsurance: 0,
-    gosi: 0,
-    insurance: 0,
-    mvpi: 0
+    gosi: 0
   });
 
   useEffect(() => {
     // Initialize demo data instantly (no backend required)
     initializeDemoData();
 
-    // Fetch initial counts from API
-    const fetchCounts = async () => {
+    // Load counts instantly from localStorage
+    const loadCountsFromLocalStorage = () => {
       try {
-        // Use Promise.allSettled to handle individual failures gracefully
-        const results = await Promise.allSettled([
-          vehicleService.getCount(),
-          homeRentService.getCount(),
-          electricityService.getCount(),
-          absherService.getCount(),
-          socialInsuranceService.getCount(),
-          gosiService.getCount()
-          // insuranceService.getCount(),
-          // mvpiService.getCount()
-        ]);
-
-        // Extract counts, defaulting to 0 if failed
-        // API service returns JSON directly (not wrapped like axios)
-        const [vehiclesCount, homeRentsCount, electricityCount, absherCount, socialInsuranceCount, gosiCount] = results.map(
-          result => result.status === 'fulfilled' ? result.value : { count: 0 }
-        );
+        const storagePrefix = 'gts_dashboard_';
+        const getCount = (key) => {
+          const data = localStorage.getItem(storagePrefix + key);
+          return data ? JSON.parse(data).length : 0;
+        };
 
         setCounts({
-          vehicles: vehiclesCount.count || 0,
-          homeRents: homeRentsCount.count || 0,
-          electricity: electricityCount.count || 0,
-          absher: absherCount.count || 0,
-          socialInsurance: socialInsuranceCount.count || 0,
-          gosi: gosiCount.count || 0,
-          insurance: 0, // insuranceCount.count,
-          mvpi: 0 // mvpiCount.count
+          vehicles: getCount('vehicles'),
+          homeRents: getCount('homeRents'),
+          electricity: getCount('electricity'),
+          absher: getCount('absher'),
+          socialInsurance: getCount('socialInsurance'),
+          gosi: getCount('gosi')
         });
       } catch (error) {
-        console.error('Error fetching counts:', error);
+        console.error('Error loading counts from localStorage:', error);
       }
     };
 
-    fetchCounts();
+    loadCountsFromLocalStorage();
 
     // Listen for count updates
     const handleCountUpdate = (event) => {
@@ -113,10 +97,8 @@ const App = () => {
 
         // If user hasn't been prompted and isn't subscribed, show banner
         if (!hasBeenPrompted && !isAlreadySubscribed && pushNotificationService.isSupported()) {
-          // Wait 3 seconds before showing banner (let the page load first)
-          setTimeout(() => {
-            setShowNotificationBanner(true);
-          }, 3000);
+          // Show banner immediately (instant loading mode)
+          setShowNotificationBanner(true);
         }
       } catch (error) {
         console.error('Error initializing notifications:', error);
@@ -241,8 +223,6 @@ const App = () => {
           absherCount={counts.absher}
           socialInsuranceCount={counts.socialInsurance}
           gosiCount={counts.gosi}
-          insuranceCount={counts.insurance}
-          mvpiCount={counts.mvpi}
           isOpen={sidebarOpen}
           onToggle={toggleSidebar}
           onDiagnosticsClick={handleDiagnosticsClick}
@@ -251,7 +231,7 @@ const App = () => {
         />
 
         {/* Main Content Area */}
-        <main className={`flex-1 overflow-y-auto transition-all duration-300 ${sidebarCollapsed ? '' : 'md:ml-64'}`}>
+        <main className={`flex-1 overflow-y-auto transition-all duration-300 ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
           <StatusLegend />
 
           {/* Notification Diagnostics Panel */}

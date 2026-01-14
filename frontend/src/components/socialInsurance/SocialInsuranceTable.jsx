@@ -1,6 +1,7 @@
 import React from 'react';
 import ActionButtons from '../common/ActionButtons';
 import ScrollableTableWrapper from '../common/ScrollableTableWrapper';
+import { calculateStatus } from '../../services/demoDataLoader';
 
 const SocialInsuranceTable = ({ data, onEdit, onDelete }) => {
   const formatDate = (dateString) => {
@@ -70,6 +71,9 @@ const SocialInsuranceTable = ({ data, onEdit, onDelete }) => {
             </tr>
           ) : (
             data.map((record) => {
+              // Recalculate status dynamically based on current date
+              const currentStatus = calculateStatus(record.endDate);
+
               return (
                 <tr key={record._id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                   <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -97,7 +101,7 @@ const SocialInsuranceTable = ({ data, onEdit, onDelete }) => {
                       : '-'}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
-                    {getStatusBadge(record.status)}
+                    {getStatusBadge(currentStatus)}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm">
                     <ActionButtons

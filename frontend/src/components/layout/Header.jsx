@@ -14,7 +14,6 @@ const Header = ({ sidebarCollapsed, sidebarOpen, onToggleSidebar, onNotification
     }
     return isDark ? <Sun size={20} /> : <Moon size={20} />;
   };
-
   const getThemeTitle = () => {
     if (themeMode === 'auto') {
       return `Auto mode (currently ${isDark ? 'dark' : 'light'}) - Click for light mode`;
@@ -24,11 +23,10 @@ const Header = ({ sidebarCollapsed, sidebarOpen, onToggleSidebar, onNotification
     }
     return 'Dark mode - Click for auto mode';
   };
-
   return (
     <div className="bg-white dark:bg-gray-900 shadow-lg transition-colors duration-200">
       <div className="w-full px-4 sm:px-6 py-3 sm:py-4">
-        <div className={`flex items-center justify-between transition-all duration-300 ${sidebarCollapsed ? '' : 'md:ml-64'}`}>
+        <div className={`flex items-center justify-between transition-all duration-300 ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
           <div className="flex items-center gap-3">
             <img
               src="/logo.svg"
@@ -52,7 +50,6 @@ const Header = ({ sidebarCollapsed, sidebarOpen, onToggleSidebar, onNotification
               )} */}
             </div>
           </div>
-
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
             {/* Notification System Button - Desktop */}
@@ -65,7 +62,6 @@ const Header = ({ sidebarCollapsed, sidebarOpen, onToggleSidebar, onNotification
               <Bell size={20} />
               <span className="text-sm font-medium">Notification System</span>
             </button>
-
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
@@ -78,7 +74,6 @@ const Header = ({ sidebarCollapsed, sidebarOpen, onToggleSidebar, onNotification
                 <span className="text-xs font-medium">Auto</span>
               )}
             </button>
-
             {/* Notification System Button - Mobile (before menu) */}
             <button
               onClick={onNotificationClick}
@@ -88,7 +83,6 @@ const Header = ({ sidebarCollapsed, sidebarOpen, onToggleSidebar, onNotification
             >
               <Bell size={20} />
             </button>
-
             {/* Mobile Menu Button */}
             <button
               onClick={onToggleSidebar}

@@ -2,8 +2,8 @@ import localStorageService from './localStorageService';
 
 // Base API configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000;
+const MAX_RETRIES = 1; // Single attempt only for demo mode
+const RETRY_DELAY = 500; // Reduced delay
 const USE_LOCAL_STORAGE = true; // Enable localStorage-first approach
 
 // Collection name mapping (endpoint -> localStorage collection)
@@ -35,7 +35,7 @@ class ApiService {
   async request(endpoint, options = {}, retryCount = 0) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // Increased to 60 seconds for Render cold starts
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 seconds timeout for demo mode
 
       // Add auth token to headers
       const token = getAuthToken();
@@ -80,7 +80,7 @@ class ApiService {
       console.error(`API Error (attempt ${retryCount + 1}/${MAX_RETRIES}):`, error);
 
       if (error.name === 'AbortError') {
-        console.error('Request timed out after 60 seconds');
+        console.error('Request timed out after 5 seconds');
       }
 
       // Don't retry on 401 errors

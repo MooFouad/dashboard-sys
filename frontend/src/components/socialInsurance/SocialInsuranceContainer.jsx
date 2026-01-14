@@ -9,6 +9,7 @@ import Pagination from '../common/Pagination';
 import { useDataManagement } from '../../hooks/useDataManagement';
 import { useAuth } from '../../contexts/AuthContext';
 import { exportSocialInsuranceToExcel } from '../../utils/excel/excelUtils';
+import { calculateStatus } from '../../services/demoDataLoader';
 
 const SocialInsuranceContainer = () => {
   const { user } = useAuth();
@@ -34,7 +35,9 @@ const SocialInsuranceContainer = () => {
     // Status filter
     let matchStatus = true;
     if (filterStatus !== 'all') {
-      matchStatus = item.status === filterStatus;
+      // Recalculate status dynamically for filtering
+      const currentStatus = calculateStatus(item.endDate);
+      matchStatus = currentStatus === filterStatus;
     }
 
     return matchSearch && matchStatus;

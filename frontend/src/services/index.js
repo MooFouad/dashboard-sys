@@ -5,8 +5,6 @@ import homeRentService from './homeRentService';
 import electricityService from './electricityService';
 import absherService from './absherService';
 import socialInsuranceService from './socialInsuranceService';
-import insuranceService from './insuranceService';
-import mvpiService from './mvpiService';
 import gosiService from './gosiService';
 
 export {
@@ -16,8 +14,6 @@ export {
   electricityService,
   absherService,
   socialInsuranceService,
-  insuranceService,
-  mvpiService,
   gosiService
 };
 
@@ -28,7 +24,5 @@ export default {
   electricity: electricityService,
   absher: absherService,
   socialInsurance: socialInsuranceService,
-  insurance: insuranceService,
-  mvpi: mvpiService,
   gosi: gosiService
 };

@@ -11,8 +11,6 @@ const Sidebar = ({
   absherCount,
   socialInsuranceCount,
   gosiCount,
-  insuranceCount,
-  mvpiCount,
   isOpen,
   onToggle,
   onDiagnosticsClick,
@@ -79,16 +77,6 @@ const Sidebar = ({
 
   return (
     <>
-      {/* Desktop Collapse Toggle Button */}
-      <button
-        onClick={onToggleCollapse}
-        className="hidden md:block fixed top-24 z-50 p-2 bg-blue-600 dark:bg-blue-700 text-white rounded-r-lg shadow-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition"
-        style={{ left: isCollapsed ? '0px' : '256px' }}
-        title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-      >
-        {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-      </button>
-
       {/* Overlay for mobile */}
       {isOpen && (
         <div
@@ -99,30 +87,26 @@ const Sidebar = ({
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full bg-white dark:bg-gray-900 shadow-xl z-40 transition-all duration-300 ease-in-out flex flex-col w-64
+        className={`fixed top-0 left-0 h-full bg-white dark:bg-gray-900 shadow-xl z-40 transition-all duration-300 ease-in-out flex flex-col
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-          ${isCollapsed ? 'md:-translate-x-full' : 'md:translate-x-0'}`}
+          md:translate-x-0
+          ${isCollapsed ? 'md:w-20' : 'md:w-64'}
+          w-64`}
       >
         {/* Sidebar Header */}
         <div className="p-4 border-b dark:border-gray-700 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+          <div className={`flex items-center ${isCollapsed ? 'md:justify-center' : ''}`}>
+            <div className={`flex items-center gap-3 ${isCollapsed ? 'md:flex-col md:gap-1' : ''}`}>
               <img
                 src="/logo.svg"
                 alt="GTS logo"
                 className="h-10 w-10 object-contain bg-white rounded-lg p-1"
               />
-              <div className="text-white">
+              <div className={`text-white ${isCollapsed ? 'md:hidden' : ''}`}>
                 <h2 className="font-bold text-lg">GTS</h2>
                 <p className="text-xs text-blue-100">Management</p>
               </div>
             </div>
-            <button
-              onClick={onToggle}
-              className="md:hidden text-white hover:bg-blue-500 rounded p-1"
-            >
-              <X size={20} />
-            </button>
           </div>
         </div>
 
@@ -132,25 +116,33 @@ const Sidebar = ({
             <div
               key={item.id}
               onClick={() => handleTabChange(item.id)}
-              className={itemClasses(item.id)}
+              className={`${itemClasses(item.id)} ${isCollapsed ? 'md:justify-center md:px-2' : ''} relative group`}
+              title={isCollapsed ? item.label : ''}
             >
-              <div className="flex items-center gap-3">
+              <div className={`flex items-center gap-3 ${isCollapsed ? 'md:flex-col md:gap-1' : ''}`}>
                 {item.useImage ? (
                   <img src="/gosi-logo.png" alt="GOSI" className="w-5 h-5" />
                 ) : (
                   <item.icon size={20} />
                 )}
-                <span className="font-medium">{item.label}</span>
+                <span className={`font-medium ${isCollapsed ? 'md:hidden' : ''}`}>{item.label}</span>
               </div>
               <span
                 className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                   activeTab === item.id
                     ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400'
                     : 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                }`}
+                } ${isCollapsed ? 'md:hidden' : ''}`}
               >
                 {item.count}
               </span>
+
+              {/* Tooltip for collapsed state */}
+              {isCollapsed && (
+                <div className="hidden md:block absolute left-full ml-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                  {item.label} ({item.count})
+                </div>
+              )}
             </div>
           ))}
         </nav>
@@ -163,32 +155,52 @@ const Sidebar = ({
                 onDiagnosticsClick();
                 if (window.innerWidth < 768) onToggle();
               }}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition"
+              className={`w-full flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition ${isCollapsed ? 'md:justify-center md:px-2' : ''}`}
               title="Notification Diagnostics"
             >
               <Info size={18} />
-              <span className="text-sm font-medium">Diagnostics</span>
+              <span className={`text-sm font-medium ${isCollapsed ? 'md:hidden' : ''}`}>Diagnostics</span>
             </button>
           </div>
 
           {/* User Profile & Logout */}
           <div className="p-4 border-t dark:border-gray-700 bg-white dark:bg-gray-900">
-            <div className="flex items-center gap-3 mb-3 px-2">
+            <div className={`flex items-center gap-3 mb-3 ${isCollapsed ? 'md:flex-col md:px-0' : 'px-2'}`}>
               <div className="flex-shrink-0 w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
                 <User size={20} className="text-blue-600 dark:text-blue-400" />
               </div>
-              <div className="flex-1 min-w-0">
+              <div className={`flex-1 min-w-0 ${isCollapsed ? 'md:hidden' : ''}`}>
                 <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{user?.name || 'User'}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.role || 'Role'}</p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-600 transition font-medium"
+              className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-600 transition font-medium ${isCollapsed ? 'md:px-2' : ''}`}
               title="Logout"
             >
               <LogOut size={18} />
-              <span>Logout</span>
+              <span className={isCollapsed ? 'md:hidden' : ''}>Logout</span>
+            </button>
+          </div>
+
+          {/* Desktop Collapse Toggle Button - Bottom */}
+          <div className={`hidden md:flex p-4 border-t dark:border-gray-700`}>
+            <button
+              onClick={onToggleCollapse}
+              className={`w-full flex items-center gap-3 py-2.5 bg-blue-600 dark:bg-blue-700 text-white rounded-lg shadow-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition font-medium ${
+                isCollapsed ? 'justify-center px-2' : 'justify-center px-4'
+              }`}
+              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {isCollapsed ? (
+                <ChevronRight size={20} />
+              ) : (
+                <>
+                  <ChevronLeft size={20} />
+                  <span>Collapse Sidebar</span>
+                </>
+              )}
             </button>
           </div>
         </div>
