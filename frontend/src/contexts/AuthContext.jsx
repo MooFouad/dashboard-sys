@@ -37,6 +37,12 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     // Demo Mode: Instant login with no API calls
     console.log('🎭 Demo Mode: Instant authentication');
+
+    // Set demo token for localStorage to work
+    if (!localStorage.getItem('token')) {
+      localStorage.setItem('token', 'demo-token-init');
+    }
+
     setUser({
       name: 'Demo User',
       email: 'demo@gts-dashboard.com',
