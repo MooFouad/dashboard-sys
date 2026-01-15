@@ -62,6 +62,8 @@ data/
 !backend/data/
 !backend/data/mock/
 !backend/data/mock/*.json
+!frontend/src/data/
+!frontend/src/data/mockData.js
 
 # Test and debug files
 backend/test-*.js
