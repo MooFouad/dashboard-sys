@@ -6,11 +6,12 @@ import ScrollableTableWrapper from '../common/ScrollableTableWrapper';
 const AbsherTable = ({ data, onEdit, onDelete }) => {
   const getEarliestExpiry = (record) => {
     // Only registration expiry is available from Istemarah Renewal API
-    const expiryDate = record.registrationExpiryDate || record.renewalExpiryDate;
+    const expiryDate = record.registrationExpiryDate || record.renewalExpiryDate || record.expiryDate;
 
-    if (!expiryDate || expiryDate === 'N/A') return null;
+    if (!expiryDate || expiryDate === 'N/A' || expiryDate === '-') return null;
 
-    return new Date(expiryDate);
+    const date = new Date(expiryDate);
+    return !isNaN(date.getTime()) ? date : null;
   };
 
   // Format plateInfo from "ببأ_7562_1" to "ب ب أ 7562"
@@ -87,12 +88,15 @@ const AbsherTable = ({ data, onEdit, onDelete }) => {
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b dark:border-gray-700">
               Days Until Expiry
             </th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b dark:border-gray-700">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
           {data.length === 0 ? (
             <tr>
-              <td colSpan="16" className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+              <td colSpan="17" className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                 No Absher records found
               </td>
             </tr>
@@ -100,7 +104,9 @@ const AbsherTable = ({ data, onEdit, onDelete }) => {
             data.map((record, index) => {
               const earliestExpiry = getEarliestExpiry(record);
               const rowClass = getRowColorClass(record, 'absher');
-              const daysUntilExpiry = earliestExpiry ? calculateRemainingDays(earliestExpiry.toISOString().split('T')[0]) : null;
+              const daysUntilExpiry = earliestExpiry && !isNaN(earliestExpiry.getTime())
+                ? calculateRemainingDays(earliestExpiry.toISOString().split('T')[0])
+                : null;
 
               // Create a unique key combining multiple fields to avoid duplicates
               const uniqueKey = record._id || `${record.plateInfo || record.plateNumber}_${record.sequenceNumber}_${index}`;
@@ -162,6 +168,24 @@ const AbsherTable = ({ data, onEdit, onDelete }) => {
                         </span>
                       )
                     ) : '-'}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => onEdit(record)}
+                        className="px-2 py-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                        title="Edit"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => onDelete(record._id)}
+                        className="px-2 py-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                        title="Delete"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );

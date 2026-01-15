@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { AppError } = require('./errorHandler');
+const mockDataService = require('../services/mockDataService');
 
 // Verify JWT token
 const authenticate = async (req, res, next) => {
@@ -32,7 +33,23 @@ const authenticate = async (req, res, next) => {
       return next();
     }
 
-    // Check if user still exists (for non-guest users)
+    // Use mock data in demo mode
+    if (process.env.USE_MOCK_DATA === 'true') {
+      const user = await mockDataService.findOne('users', { _id: decoded.userId });
+
+      if (!user) {
+        return next(new AppError('User no longer exists.', 401));
+      }
+
+      if (!user.isActive) {
+        return next(new AppError('User account is deactivated.', 401));
+      }
+
+      req.user = user;
+      return next();
+    }
+
+    // Check if user still exists (for non-guest users) - MongoDB
     const user = await User.findById(decoded.userId);
 
     if (!user) {

@@ -1,6 +1,6 @@
 export const getExpiryStatus = (dateString) => {
-      // إذا كان التاريخ غير موجود، نرجع 'valid' عشان ما يظهرش أحمر
-      if (!dateString) return 'valid';
+      // If date is missing or invalid, return 'valid'
+      if (!dateString || dateString === '-' || dateString === 'N/A') return 'valid';
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -8,14 +8,14 @@ export const getExpiryStatus = (dateString) => {
       const expiryDate = new Date(dateString);
       expiryDate.setHours(0, 0, 0, 0);
 
-      // تحقق إذا كان التاريخ صحيح
+      // Check if date is valid
       if (isNaN(expiryDate.getTime())) return 'valid';
 
       const diffTime = expiryDate - today;
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
       if (diffDays < 0) return 'expired';
-      if (diffDays <= 10) return 'warning';
+      if (diffDays <= 30) return 'warning';
       return 'valid';
 };
 
@@ -37,19 +37,20 @@ export const isValidDate = (dateString) => {
 };
 
 export const parseDate = (dateString) => {
-  if (!dateString) return null;
-  
-  // Handle ISO date strings
-  if (typeof dateString === 'string' && dateString.includes('-')) {
-    const [year, month, day] = dateString.split('-');
-    return new Date(year, month - 1, day);
+  if (!dateString || dateString === '-' || dateString === 'N/A') return null;
+
+  // Handle ISO date strings (YYYY-MM-DD)
+  if (typeof dateString === 'string' && /^\d{4}-\d{2}-\d{2}/.test(dateString)) {
+    const [year, month, day] = dateString.split('-').map(num => parseInt(num, 10));
+    const date = new Date(year, month - 1, day);
+    return !isNaN(date.getTime()) ? date : null;
   }
-  
+
   // Handle date objects
   if (dateString instanceof Date) {
-    return dateString;
+    return !isNaN(dateString.getTime()) ? dateString : null;
   }
-  
+
   // Try parsing other formats
   const parsed = new Date(dateString);
   return !isNaN(parsed.getTime()) ? parsed : null;

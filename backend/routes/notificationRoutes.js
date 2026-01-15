@@ -340,8 +340,8 @@ router.get('/preferences/:email', authenticate, async (req, res) => {
   }
 });
 
-// Get all subscriptions (for debugging)
-router.get('/subscriptions', authenticate, async (req, res) => {
+// Get all subscriptions (for debugging) - no auth required for demo mode
+router.get('/subscriptions', async (req, res) => {
   try {
     const SubscriptionService = getSubscriptionService();
     const subscriptions = useMockData

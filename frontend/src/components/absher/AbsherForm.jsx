@@ -4,28 +4,39 @@ import FormActions from '../common/FormActions';
 
 const AbsherForm = ({ onSubmit, onCancel, initialData = null }) => {
   const [formData, setFormData] = useState({
-    referenceNumber: '',
-    name: '',
-    issueDate: '',
-    expiryDate: '',
-    inspectionExpiryDate: '',
-    licenseExpiryDate: '',
     plateNumber: '',
     ownerName: '',
-    ownerId: '',
-    vehicleType: '',
-    notes: ''
+    ownerIdNumber: '',
+    maker: '',
+    model: '',
+    modelYear: '',
+    majorColor: '',
+    renewalExpiryDate: '',
+    sequenceNumber: ''
   });
 
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      setFormData({
+        plateNumber: initialData.plateNumber || '',
+        ownerName: initialData.ownerName || '',
+        ownerIdNumber: initialData.ownerIdNumber || '',
+        maker: initialData.maker || '',
+        model: initialData.model || '',
+        modelYear: initialData.modelYear || '',
+        majorColor: initialData.majorColor || '',
+        renewalExpiryDate: initialData.renewalExpiryDate || initialData.registrationExpiryDate || '',
+        sequenceNumber: initialData.sequenceNumber || ''
+      });
     }
   }, [initialData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit({
+      ...formData,
+      registrationExpiryDate: formData.renewalExpiryDate
+    });
   };
 
   const handleChange = (field, value) => {
@@ -35,75 +46,96 @@ const AbsherForm = ({ onSubmit, onCancel, initialData = null }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Reference Number */}
-        <FormField label="Reference Number *" required>
-          <input
-            type="text"
-            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
-            value={formData.referenceNumber}
-            onChange={(e) => handleChange('referenceNumber', e.target.value)}
-            required
-          />
-        </FormField>
-
-        {/* Name */}
-        <FormField label="Name *" required>
-          <input
-            type="text"
-            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
-            value={formData.name}
-            onChange={(e) => handleChange('name', e.target.value)}
-            required
-          />
-        </FormField>
-
         {/* Plate Number */}
-        <FormField label="Plate Number">
+        <FormField label="Plate Number *" required>
           <input
             type="text"
-            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
             value={formData.plateNumber}
             onChange={(e) => handleChange('plateNumber', e.target.value)}
+            placeholder="e.g. ABC-1234"
+            required
           />
         </FormField>
 
-        {/* Vehicle Type */}
-        <FormField label="Vehicle Type">
+        {/* Sequence Number */}
+        <FormField label="Sequence Number">
           <input
             type="text"
-            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
-            value={formData.vehicleType}
-            onChange={(e) => handleChange('vehicleType', e.target.value)}
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
+            value={formData.sequenceNumber}
+            onChange={(e) => handleChange('sequenceNumber', e.target.value)}
+            placeholder="e.g. 12345678"
           />
         </FormField>
 
         {/* Owner Name */}
-        <FormField label="Owner Name">
+        <FormField label="Owner Name *" required>
           <input
             type="text"
-            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
             value={formData.ownerName}
             onChange={(e) => handleChange('ownerName', e.target.value)}
+            required
           />
         </FormField>
 
         {/* Owner ID */}
-        <FormField label="Owner ID">
+        <FormField label="Owner ID Number">
           <input
             type="text"
-            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
-            value={formData.ownerId}
-            onChange={(e) => handleChange('ownerId', e.target.value)}
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
+            value={formData.ownerIdNumber}
+            onChange={(e) => handleChange('ownerIdNumber', e.target.value)}
+            placeholder="e.g. 1023456789"
           />
         </FormField>
 
-        {/* Issue Date */}
-        <FormField label="Issue Date">
+        {/* Maker */}
+        <FormField label="Maker *" required>
           <input
-            type="date"
-            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
-            value={formData.issueDate}
-            onChange={(e) => handleChange('issueDate', e.target.value)}
+            type="text"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
+            value={formData.maker}
+            onChange={(e) => handleChange('maker', e.target.value)}
+            placeholder="e.g. Toyota"
+            required
+          />
+        </FormField>
+
+        {/* Model */}
+        <FormField label="Model *" required>
+          <input
+            type="text"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
+            value={formData.model}
+            onChange={(e) => handleChange('model', e.target.value)}
+            placeholder="e.g. Camry"
+            required
+          />
+        </FormField>
+
+        {/* Model Year */}
+        <FormField label="Model Year">
+          <input
+            type="number"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
+            value={formData.modelYear}
+            onChange={(e) => handleChange('modelYear', e.target.value)}
+            placeholder="e.g. 2020"
+            min="1990"
+            max="2030"
+          />
+        </FormField>
+
+        {/* Color */}
+        <FormField label="Color">
+          <input
+            type="text"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
+            value={formData.majorColor}
+            onChange={(e) => handleChange('majorColor', e.target.value)}
+            placeholder="e.g. White"
           />
         </FormField>
 
@@ -111,43 +143,13 @@ const AbsherForm = ({ onSubmit, onCancel, initialData = null }) => {
         <FormField label="Registration Expiry Date *" required>
           <input
             type="date"
-            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
-            value={formData.expiryDate}
-            onChange={(e) => handleChange('expiryDate', e.target.value)}
+            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
+            value={formData.renewalExpiryDate}
+            onChange={(e) => handleChange('renewalExpiryDate', e.target.value)}
             required
           />
         </FormField>
-
-        {/* Inspection Expiry Date */}
-        <FormField label="Inspection Expiry Date">
-          <input
-            type="date"
-            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
-            value={formData.inspectionExpiryDate}
-            onChange={(e) => handleChange('inspectionExpiryDate', e.target.value)}
-          />
-        </FormField>
-
-        {/* License Expiry Date */}
-        <FormField label="License Expiry Date">
-          <input
-            type="date"
-            className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
-            value={formData.licenseExpiryDate}
-            onChange={(e) => handleChange('licenseExpiryDate', e.target.value)}
-          />
-        </FormField>
       </div>
-
-      {/* Notes - Full Width */}
-      <FormField label="Notes">
-        <textarea
-          className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-colors duration-200"
-          value={formData.notes}
-          onChange={(e) => handleChange('notes', e.target.value)}
-          rows="3"
-        />
-      </FormField>
 
       <FormActions
         onSubmit={handleSubmit}

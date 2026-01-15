@@ -41,22 +41,18 @@ export const getRowColorClass = (item, type) => {
       }
 
       if (type === 'absher') {
-            const dates = [
-                  item.expiryDate,
-                  item.inspectionExpiryDate,
-                  item.licenseExpiryDate
-            ].filter(date => date);
+            const renewalDate = item.renewalExpiryDate || item.registrationExpiryDate || item.expiryDate;
 
-            if (dates.length === 0) {
+            if (!renewalDate || renewalDate === '-' || renewalDate === 'N/A') {
                   return 'bg-white dark:bg-gray-900 border-l-4 border-transparent';
             }
 
-            const statuses = dates.map(date => getExpiryStatus(date));
+            const status = getExpiryStatus(renewalDate);
 
-            if (statuses.some(status => status === 'expired')) {
+            if (status === 'expired') {
                   return 'bg-red-100 dark:bg-red-900/30 border-l-4 border-red-500 dark:border-red-400';
             }
-            if (statuses.some(status => status === 'warning')) {
+            if (status === 'warning') {
                   return 'bg-yellow-100 dark:bg-yellow-900/30 border-l-4 border-orange-500 dark:border-orange-400';
             }
       }

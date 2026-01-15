@@ -68,7 +68,14 @@
       "Bash(wc:*)",
       "Bash(timeout /t 3)",
       "Bash(test:*)",
-      "Bash(git clean:*)"
+      "Bash(git clean:*)",
+      "Bash(pkill:*)",
+      "Bash(git checkout:*)",
+      "Bash(timeout /t 5)",
+      "Bash(powershell \"Stop-Process -Id 23536 -Force\")",
+      "Bash(taskkill.exe:*)",
+      "Bash(powershell -Command \"Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force\")",
+      "Bash(cd:*)"
     ],
     "deny": [],
     "ask": []
