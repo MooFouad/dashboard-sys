@@ -35,70 +35,93 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAuth = async () => {
-    // Demo Mode: Instant login with no API calls
-    console.log('🎭 Demo Mode: Instant authentication');
-
-    // Set demo token for localStorage to work
-    if (!localStorage.getItem('token')) {
-      localStorage.setItem('token', 'demo-token-init');
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setLoading(false);
+      return;
     }
 
-    setUser({
-      name: 'Demo User',
-      email: 'demo@gts-dashboard.com',
-      role: 'guest'
-    });
-    setIsAuthenticated(true);
-    setLoading(false);
+    try {
+      const response = await api.request('/auth/me', { method: 'GET' });
+      if (response.success && response.data?.user) {
+        setUser(response.data.user);
+        setIsAuthenticated(true);
+      } else {
+        localStorage.removeItem('token');
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      localStorage.removeItem('token');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const login = async (email, password) => {
-    // Demo Mode: Instant login
-    const demoUser = {
-      name: email.split('@')[0] || 'User',
-      email: email,
-      role: 'user'
-    };
+    try {
+      const response = await api.request('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
 
-    localStorage.setItem('token', 'demo-token-' + Date.now());
-    setUser(demoUser);
-    setIsAuthenticated(true);
+      if (response.success && response.data) {
+        localStorage.setItem('token', response.data.token);
+        setUser(response.data.user);
+        setIsAuthenticated(true);
+        return { success: true };
+      }
 
-    return { success: true };
+      return { success: false, error: 'Login failed' };
+    } catch (error) {
+      return { success: false, error: error.message || 'Invalid email or password' };
+    }
   };
 
   const register = async (name, email, password) => {
-    // Demo Mode: Instant registration
-    const demoUser = {
-      name: name,
-      email: email,
-      role: 'user'
-    };
+    try {
+      const response = await api.request('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({ name, email, password }),
+      });
 
-    localStorage.setItem('token', 'demo-token-' + Date.now());
-    setUser(demoUser);
-    setIsAuthenticated(true);
+      if (response.success && response.data) {
+        localStorage.setItem('token', response.data.token);
+        setUser(response.data.user);
+        setIsAuthenticated(true);
+        return { success: true };
+      }
 
-    return { success: true };
+      return { success: false, error: 'Registration failed' };
+    } catch (error) {
+      return { success: false, error: error.message || 'Registration failed' };
+    }
   };
 
   const guestLogin = async () => {
-    // Demo Mode: Instant guest login
-    const guestUser = {
-      name: 'Guest User',
-      email: 'guest@gts-dashboard.com',
-      role: 'guest'
-    };
+    try {
+      const response = await api.request('/auth/guest', {
+        method: 'POST',
+      });
 
-    localStorage.setItem('token', 'demo-guest-token');
-    setUser(guestUser);
-    setIsAuthenticated(true);
+      if (response.success && response.data) {
+        localStorage.setItem('token', response.data.token);
+        setUser(response.data.user);
+        setIsAuthenticated(true);
+        return { success: true };
+      }
 
-    return { success: true };
+      return { success: false, error: 'Guest login failed' };
+    } catch (error) {
+      return { success: false, error: error.message || 'Guest login failed' };
+    }
   };
 
   const logout = async () => {
-    // Demo Mode: Instant logout
+    try {
+      await api.request('/auth/logout', { method: 'POST' });
+    } catch (error) {
+      // Logout even if the API call fails
+    }
     localStorage.removeItem('token');
     setUser(null);
     setIsAuthenticated(false);
