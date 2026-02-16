@@ -1,11 +1,66 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import api from '../services/api';
+
+const STORAGE_PREFIX = 'gts_dashboard_';
+const COLLECTION_MAP = {
+  homeRent: 'homeRents',
+  vehicle: 'vehicles',
+  electricity: 'electricity',
+  absher: 'absher',
+  socialInsurance: 'socialInsurance',
+  gosi: 'gosi',
+};
+
+// Read data synchronously from localStorage to avoid loading flash
+const getInitialData = (type) => {
+  try {
+    const collection = COLLECTION_MAP[type];
+    if (!collection) return null;
+    const raw = localStorage.getItem(STORAGE_PREFIX + collection);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {
+    // fall through
+  }
+  return null;
+};
+
+// Enrich socialInsurance items with calculated fields (used for synchronous init)
+const enrichInitialData = (items) => {
+  return items.map(item => {
+    if (item.remainingDays !== undefined && item.remainingDays !== null && item.status) {
+      return item;
+    }
+    let remainingDays = null;
+    let status = null;
+    if (item.endDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const endDate = new Date(item.endDate);
+      endDate.setHours(0, 0, 0, 0);
+      remainingDays = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+      if (remainingDays < 0) status = 'expired';
+      else if (remainingDays <= 30) status = 'expiring-soon';
+      else status = 'active';
+    }
+    return { ...item, remainingDays, status: status || item.status };
+  });
+};
 
 export const useDataManagement = (type, options = {}) => {
   const { usePagination = true, defaultPageSize = 25, searchTerm = '', filterStatus = 'all' } = options;
 
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const cachedData = useRef(getInitialData(type));
+  const initialData = useRef(cachedData.current);
+  const [data, setData] = useState(() => {
+    if (!cachedData.current) return [];
+    // Enrich socialInsurance data on init
+    if (type === 'socialInsurance') return enrichInitialData(cachedData.current);
+    return cachedData.current;
+  });
+  const [loading, setLoading] = useState(!cachedData.current);
   const [error, setError] = useState(null);
 
   // Pagination state
@@ -72,9 +127,9 @@ export const useDataManagement = (type, options = {}) => {
     });
   };
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       setError(null);
       const endpoint = getEndpoint(type);
 
@@ -121,7 +176,13 @@ export const useDataManagement = (type, options = {}) => {
   }, [type, currentPage, pageSize, usePagination, searchTerm, filterStatus]);
 
   useEffect(() => {
-    fetchData();
+    // If we loaded initial data synchronously, do a background refresh without showing spinner
+    if (initialData.current) {
+      initialData.current = null; // Only skip loading indicator on first mount
+      fetchData(false);
+    } else {
+      fetchData(true);
+    }
   }, [fetchData]);
 
   const validateData = useCallback((items) => {

@@ -7,14 +7,14 @@ import LoadingSpinner from './components/common/LoadingSpinner';
 import pushNotificationService from './services/pushNotificationService';
 import { initializeDemoData } from './services/demoDataLoader';
 
-// Lazy load container components for code splitting
-const HomeRentsContainer = lazy(() => import('./components/homeRents/HomeRentsContainer'));
-const ElectricityContainer = lazy(() => import('./components/electricity/ElectricityContainer'));
-const AbsherContainer = lazy(() => import('./components/absher/AbsherContainer'));
-const SocialInsuranceContainer = lazy(() => import('./components/socialInsurance/SocialInsuranceContainer'));
-const GOSIContainer = lazy(() => import('./components/gosi/GOSIContainer'));
+// Direct imports for fast initial render (data is already in localStorage)
+import HomeRentsContainer from './components/homeRents/HomeRentsContainer';
+import ElectricityContainer from './components/electricity/ElectricityContainer';
+import AbsherContainer from './components/absher/AbsherContainer';
+import SocialInsuranceContainer from './components/socialInsurance/SocialInsuranceContainer';
+import GOSIContainer from './components/gosi/GOSIContainer';
 
-// Lazy load notification components to prevent errors
+// Lazy load notification components (not needed on initial render)
 const NotificationModal = lazy(() =>
   import('./components/common/NotificationModal').catch(() => ({
     default: () => <div>Notification Modal Not Available</div>
@@ -244,27 +244,11 @@ const App = () => {
           )}
 
           <div className="p-2 sm:p-4">
-            <Suspense fallback={<LoadingSpinner message="Loading content..." />}>
-              <div className={activeTab === 'absher' ? 'block' : 'hidden'}>
-                <AbsherContainer />
-              </div>
-
-              <div className={activeTab === 'homeRents' ? 'block' : 'hidden'}>
-                <HomeRentsContainer />
-              </div>
-
-              <div className={activeTab === 'electricity' ? 'block' : 'hidden'}>
-                <ElectricityContainer />
-              </div>
-
-              <div className={activeTab === 'socialInsurance' ? 'block' : 'hidden'}>
-                <SocialInsuranceContainer />
-              </div>
-
-              <div className={activeTab === 'gosi' ? 'block' : 'hidden'}>
-                <GOSIContainer />
-              </div>
-            </Suspense>
+            {activeTab === 'absher' && <AbsherContainer />}
+            {activeTab === 'homeRents' && <HomeRentsContainer />}
+            {activeTab === 'electricity' && <ElectricityContainer />}
+            {activeTab === 'socialInsurance' && <SocialInsuranceContainer />}
+            {activeTab === 'gosi' && <GOSIContainer />}
           </div>
         </main>
       </div>
