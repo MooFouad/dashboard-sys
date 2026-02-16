@@ -7,6 +7,9 @@ import LoadingSpinner from './components/common/LoadingSpinner';
 import pushNotificationService from './services/pushNotificationService';
 import { initializeDemoData } from './services/demoDataLoader';
 
+// Initialize demo data at module level (before any component renders)
+initializeDemoData();
+
 // Direct imports for fast initial render (data is already in localStorage)
 import HomeRentsContainer from './components/homeRents/HomeRentsContainer';
 import ElectricityContainer from './components/electricity/ElectricityContainer';
@@ -44,9 +47,6 @@ const App = () => {
   });
 
   useEffect(() => {
-    // Initialize demo data instantly (no backend required)
-    initializeDemoData();
-
     // Load counts instantly from localStorage
     const loadCountsFromLocalStorage = () => {
       try {
