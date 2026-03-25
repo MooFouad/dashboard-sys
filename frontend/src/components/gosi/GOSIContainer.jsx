@@ -392,28 +392,28 @@ const GOSIContainer = () => {
       {/* Add Single Employee Dialog */}
       {addDialog.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 className="text-xl font-semibold mb-4">Add Single Employee from GOSI</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
+            <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Add Single Employee from GOSI</h3>
 
             <div className="space-y-4">
-              <div className="bg-blue-50 p-4 rounded border border-blue-200">
-                <p className="text-sm text-blue-800 mb-2">
+              <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded border border-blue-200 dark:border-blue-700">
+                <p className="text-sm text-blue-800 dark:text-blue-300 mb-2">
                   Enter the employee's National ID (NIN) or Iqama number to fetch their data from GOSI API.
                 </p>
-                <p className="text-xs text-blue-700">
+                <p className="text-xs text-blue-700 dark:text-blue-400">
                   This will retrieve engagement info, deduction rates, and insurance coverage details.
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                   National ID / Iqama Number <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={addDialog.nin}
                   onChange={(e) => setAddDialog({ ...addDialog, nin: e.target.value })}
-                  className="w-full p-3 border rounded focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="w-full p-3 border dark:border-gray-600 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   placeholder="Enter NIN or Iqama number"
                   disabled={syncing}
                   autoFocus
@@ -429,22 +429,22 @@ const GOSIContainer = () => {
                 <div
                   className={`p-3 rounded border ${
                     syncMessage.type === 'success'
-                      ? 'bg-green-50 text-green-800 border-green-200'
-                      : 'bg-red-50 text-red-800 border-red-200'
+                      ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-700'
+                      : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-200 dark:border-red-700'
                   }`}
                 >
                   {syncMessage.text}
                 </div>
               )}
 
-              <div className="flex justify-end gap-2 pt-4 border-t">
+              <div className="flex justify-end gap-2 pt-4 border-t dark:border-gray-700">
                 <button
                   onClick={() => {
                     setAddDialog({ isOpen: false, nin: '' });
                     setSyncMessage(null);
                   }}
                   disabled={syncing}
-                  className="px-4 py-2 border rounded hover:bg-gray-50 disabled:bg-gray-100"
+                  className="px-4 py-2 border dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:bg-gray-100 dark:disabled:bg-gray-700 text-gray-700 dark:text-gray-300"
                 >
                   Cancel
                 </button>

@@ -273,6 +273,15 @@ router.post('/bulk-delete', async (req, res, next) => {
       });
     }
 
+    if (process.env.USE_MOCK_DATA === 'true') {
+      const result = await mockDataService.deleteMany('gosi', ids);
+      return res.json({
+        success: true,
+        message: `Deleted ${result.deletedCount} GOSI records`,
+        deletedCount: result.deletedCount
+      });
+    }
+
     const result = await GOSI.deleteMany({ _id: { $in: ids } });
 
     res.json({

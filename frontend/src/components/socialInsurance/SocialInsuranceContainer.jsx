@@ -7,12 +7,10 @@ import Toolbar from '../layout/Toolbar';
 import ExportButton from '../common/ExportButton';
 import Pagination from '../common/Pagination';
 import { useDataManagement } from '../../hooks/useDataManagement';
-import { useAuth } from '../../contexts/AuthContext';
 import { exportSocialInsuranceToExcel } from '../../utils/excel/excelUtils';
 import { calculateStatus } from '../../services/demoDataLoader';
 
 const SocialInsuranceContainer = () => {
-  const { user } = useAuth();
   const [formDialog, setFormDialog] = useState({ isOpen: false, data: null });
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, id: null });
   const [searchTerm, setSearchTerm] = useState('');

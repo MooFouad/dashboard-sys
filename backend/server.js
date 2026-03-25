@@ -254,7 +254,4 @@ if (process.env.VERCEL !== '1') {
 process.on('unhandledRejection', handleUnhandledRejection);
 
 // Export the Express app for Vercel serverless
-module.exports = app; 
-// Restart
-
-
+module.exports = app;

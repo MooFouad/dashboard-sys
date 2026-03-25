@@ -7,11 +7,9 @@ import Toolbar from '../layout/Toolbar';
 import Pagination from '../common/Pagination';
 import ExportButton from '../common/ExportButton';
 import { useDataManagement } from '../../hooks/useDataManagement';
-import { useAuth } from '../../contexts/AuthContext';
 import { exportHomeRentsToExcel } from '../../utils/excel/excelUtils';
 
 const HomeRentsContainer = () => {
-  const { user } = useAuth();
   const [formDialog, setFormDialog] = useState({ isOpen: false, data: null });
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, id: null });
   const [searchTerm, setSearchTerm] = useState('');
@@ -89,7 +87,6 @@ const HomeRentsContainer = () => {
   };
 
   const handleDelete = (id) => {
-    console.log('Initiating delete for:', id);
     setDeleteDialog({ isOpen: true, id });
   };
 
