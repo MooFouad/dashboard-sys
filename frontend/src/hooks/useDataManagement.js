@@ -185,44 +185,6 @@ export const useDataManagement = (type, options = {}) => {
     }
   }, [fetchData]);
 
-  const validateData = useCallback((items) => {
-    if (!Array.isArray(items)) {
-      console.error('Invalid data format:', items);
-      return [];
-    }
-
-    return items.map(item => {
-      // Ensure all required fields exist
-      const validatedItem = {
-        _id: item._id || '',
-        name: item.name || '',
-        location: item.location || '',
-        contractNumber: item.contractNumber || '',
-        contractStartingDate: item.contractStartingDate || '',
-        contractEndingDate: item.contractEndingDate || '',
-        contractStatus: item.contractStatus || 'Active',
-        rentAnnually: Number(item.rentAnnually) || 0,
-        contactNo: item.contactNo || '',
-        gts: item.gts || '',
-        attachments: Array.isArray(item.attachments) ? item.attachments : []
-      };
-
-      // Ensure dates are in correct format
-      try {
-        if (validatedItem.contractStartingDate) {
-          new Date(validatedItem.contractStartingDate).toISOString();
-        }
-        if (validatedItem.contractEndingDate) {
-          new Date(validatedItem.contractEndingDate).toISOString();
-        }
-      } catch (error) {
-        console.error('Invalid date format:', error);
-      }
-
-      return validatedItem;
-    });
-  }, []);
-
   const addItem = useCallback(async (data) => {
     try {
       const endpoint = getEndpoint(type);

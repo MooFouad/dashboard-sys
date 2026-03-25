@@ -7,14 +7,12 @@ import Toolbar from '../layout/Toolbar';
 import ExportButton from '../common/ExportButton';
 import Pagination from '../common/Pagination';
 import { useDataManagement } from '../../hooks/useDataManagement';
-import { useAuth } from '../../contexts/AuthContext';
 import { exportVehiclesToExcel } from '../../utils/excel/excelUtils';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const VehiclesContainer = () => {
-  const { user } = useAuth();
   const [formDialog, setFormDialog] = useState({ isOpen: false, data: null });
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, id: null });
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,13 +20,6 @@ const VehiclesContainer = () => {
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState(null);
   const { data: items, addItem, updateItem, deleteItem, loading, error, refreshData, pagination } = useDataManagement('vehicle');
-
-  // Add debug logging
-  useEffect(() => {
-    console.log('Current items:', items);
-    console.log('Loading state:', loading);
-    if (error) console.error('Error state:', error);
-  }, [items, loading, error]);
 
   const filteredItems = items.filter((item) => {
     // Search filter

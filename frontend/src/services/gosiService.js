@@ -67,6 +67,18 @@ export const remove = async (id) => {
  * @returns {Promise<Object>} - Deletion result
  */
 export const bulkDelete = async (ids) => {
+  // Delete each item directly from localStorage
+  let deletedCount = 0;
+  for (const id of ids) {
+    if (localStorageService.delete('gosi', id)) {
+      deletedCount++;
+    }
+  }
+  if (deletedCount > 0) {
+    return { success: true, deletedCount };
+  }
+
+  // Fallback to API if no items found in localStorage
   return await api.post('/gosi/bulk-delete', { ids });
 };
 

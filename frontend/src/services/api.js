@@ -16,14 +16,30 @@ const COLLECTION_MAP = {
   '/absher': 'absher'
 };
 
+// Sub-routes that must bypass localStorage and go directly to the API
+const BYPASS_LOCALSTORAGE_PATHS = new Set([
+  '/gosi/bulk-delete',
+  '/gosi/sync-multiple',
+]);
+
 // Get auth token
 const getAuthToken = () => {
   return localStorage.getItem('token');
 };
 
-// Helper to extract collection name from endpoint
+// Helper to extract collection name from endpoint.
+// Returns null for sub-routes that should not be intercepted by localStorage.
 const getCollectionName = (endpoint) => {
-  const baseEndpoint = endpoint.split('?')[0].split('/').slice(0, 2).join('/');
+  const cleanPath = endpoint.split('?')[0];
+
+  // Explicitly bypass known sub-routes
+  if (BYPASS_LOCALSTORAGE_PATHS.has(cleanPath)) return null;
+
+  // Bypass paths with 3+ segments (e.g. /gosi/sync/:nin, /gosi/count/total)
+  const parts = cleanPath.split('/').filter(p => p.length > 0);
+  if (parts.length >= 3) return null;
+
+  const baseEndpoint = cleanPath.split('/').slice(0, 2).join('/');
   return COLLECTION_MAP[baseEndpoint];
 };
 
