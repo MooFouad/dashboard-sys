@@ -39,33 +39,34 @@ const mongooseOptions = {
   tlsAllowInvalidCertificates: false
 };
 
-// MongoDB connection with retry logic
+// Load mock data and flip the USE_MOCK_DATA flag so all route handlers see it
+const enableMockMode = async () => {
+  process.env.USE_MOCK_DATA = 'true';
+  console.log('📦 DEMO MODE: Using mock JSON data (no database connection)');
+  console.log('   Data loaded from: backend/data/mock/*.json');
+  console.log('   Push subscriptions stored in-memory (lost on server restart)');
+
+  const mockDataService = require('./services/mockDataService');
+  await mockDataService.loadData();
+
+  const stats = await mockDataService.getStats();
+  console.log('✅ Mock data loaded:');
+  Object.entries(stats).forEach(([collection, count]) => {
+    if (count > 0) console.log(`   - ${collection}: ${count} items`);
+  });
+};
+
+// MongoDB connection with automatic fallback to mock data
 const connectDB = async () => {
-  // Skip MongoDB connection if using mock data (portfolio demo mode)
-  if (process.env.USE_MOCK_DATA === 'true') {
-    console.log('📦 DEMO MODE: Using mock JSON data (no database connection)');
-    console.log('   Data loaded from: backend/data/mock/*.json');
-    console.log('   Push subscriptions stored in-memory (lost on server restart)');
-
-    // Load mock data service
-    const mockDataService = require('./services/mockDataService');
-    await mockDataService.loadData();
-
-    const stats = await mockDataService.getStats();
-    console.log('✅ Mock data loaded:');
-    Object.entries(stats).forEach(([collection, count]) => {
-      if (count > 0) {
-        console.log(`   - ${collection}: ${count} items`);
-      }
-    });
-    return;
+  // Already in mock/demo mode — skip DB entirely
+  if (process.env.USE_MOCK_DATA === 'true' || process.env.DEMO_MODE === 'true') {
+    return enableMockMode();
   }
 
-  // Normal MongoDB connection for production
+  // No URI provided — auto-enable mock mode instead of crashing
   if (!process.env.MONGODB_URI) {
-    console.error('❌ MONGODB_URI not found in environment variables');
-    console.log('💡 Set MONGODB_URI in .env file or set USE_MOCK_DATA=true for demo mode');
-    process.exit(1);
+    console.warn('⚠️  MONGODB_URI not set — falling back to mock data mode.');
+    return enableMockMode();
   }
 
   const maxRetries = 3;
@@ -81,24 +82,15 @@ const connectDB = async () => {
       retries++;
       console.error(`❌ MongoDB Connection Error (Attempt ${retries}/${maxRetries}):`, err.message);
 
-      if (err.code === 'ECONNREFUSED' && err.syscall === 'querySrv') {
-        console.log('\n💡 Troubleshooting Tips:');
-        console.log('   1. Check your internet connection');
-        console.log('   2. Verify MongoDB Atlas IP whitelist (add 0.0.0.0/0 for testing)');
-        console.log('   3. Try using NODE_OPTIONS="--dns-result-order=ipv4first" npm run dev');
-        console.log('   4. Check if your antivirus/firewall is blocking the connection');
-        console.log('   5. Verify your MongoDB credentials in .env file\n');
+      if (retries < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, 3000));
       }
-
-      if (retries === maxRetries) {
-        console.error('❌ Failed to connect to MongoDB after maximum retries');
-        process.exit(1);
-      }
-
-      // Wait before retrying
-      await new Promise(resolve => setTimeout(resolve, 3000));
     }
   }
+
+  // All retries exhausted — fall back to mock data instead of crashing
+  console.warn('⚠️  Could not connect to MongoDB after all retries — falling back to mock data mode.');
+  return enableMockMode();
 };
 
 connectDB();
