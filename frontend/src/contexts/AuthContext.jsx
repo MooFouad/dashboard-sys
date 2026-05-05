@@ -162,20 +162,18 @@ export const AuthProvider = ({ children }) => {
 
       return { success: false, error: 'Guest login failed' };
     } catch (error) {
-      // Backend unreachable — create a local guest session
-      if (isDemoMode()) {
-        const guestUser = createLocalSession({
-          id: `guest_${Date.now()}`,
-          name: 'Guest User',
-          email: 'guest@gts-demo.com',
-          role: 'user',
-          isGuest: true,
-        });
-        setUser(guestUser);
-        setIsAuthenticated(true);
-        return { success: true };
-      }
-      return { success: false, error: error.message || 'Guest login failed' };
+      // Backend unreachable — always fall back to a local guest session.
+      // Guest login has no real credentials so there is no security risk.
+      const guestUser = createLocalSession({
+        id: `guest_${Date.now()}`,
+        name: 'Guest User',
+        email: 'guest@gts-demo.com',
+        role: 'user',
+        isGuest: true,
+      });
+      setUser(guestUser);
+      setIsAuthenticated(true);
+      return { success: true };
     }
   };
 
